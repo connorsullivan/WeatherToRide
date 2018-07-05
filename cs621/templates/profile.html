@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    User Profile
+{% endblock %}
+
+{% block body %}
+
+    <div class="jumbotron text-center">
+        <h1>User Information</h1><br>
+        <p class="lead">
+            Welcome to {{ user['username'] }}'s profile!
+        </p>
+    </div>
+
+{% endblock %}

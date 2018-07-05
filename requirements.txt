@@ -1,0 +1,8 @@
+pymysql
+flask-sqlalchemy
+flask-wtf
+flask-login
+passlib
+argon2_cffi
+sendgrid
+twilio

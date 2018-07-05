@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    All Users
+{% endblock %}
+
+{% block body %}
+
+    <div class="jumbotron text-center">
+
+        <h1>Users</h1><br>
+
+            {% if users %}
+                <ul class="list-group">
+                    {% for user in users %}
+                        <li class="list-group-item">{{ user['username'] }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="lead">There are no users in the database :(</p>
+            {% endif %}
+            
+    </div>
+
+{% endblock %}

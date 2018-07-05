@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>Activate Your Account</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+
+</head>
+
+<body>
+
+    <div class="jumbotron text-center">
+        <h1>Hello, {{ username }}!</h1>
+        <br>
+        <p class="lead">
+            Thanks for riding with us. Click below to activate your account.
+        </p>
+        <br>
+        <a href="{{ confirm_url }}" class="btn btn-primary btn-lg" role="button">Activate My Account</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+
+</body>
+
+</html>
