@@ -1,6 +1,10 @@
 # WeatherToRide
 
-Making travel plans can be challenging, especially when you don't know how the weather will behave. This is an even bigger deal for those riding on motorcycles or other exposed vehicles, as bad weather can make the whole trip a no-go. WeatherToRide is designed with riders in mind, and helps to solve this problem by providing on-demand weather forecasting for the days and times you'll be out in the elements. After registering an account, simply provide your desired days, times, and locations for travel, and we'll do the rest. We'll let you know if you're good to ride, or should maybe take the car instead.
+* Making travel plans can be challenging, especially when you don't know how the weather will behave. This is an even bigger deal for those riding on motorcycles or other exposed vehicles, as bad weather can make the whole trip a no-go.
+
+* WeatherToRide is designed with riders in mind and helps to solve this problem by providing on-demand weather forecasting for the days and times you'll be out in the elements.
+
+* After registering an account, simply tell us your travel schedule and we'll let you know if you're good to ride or should maybe take the car instead.
 
 ## Getting Started
 
