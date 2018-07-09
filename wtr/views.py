@@ -26,11 +26,11 @@ def page_not_found(e):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', user=current_user)
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    return render_template('about.html', user=current_user)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -94,7 +94,7 @@ def register():
 
         return redirect(url_for('login'))
 
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=form, user=current_user)
 
 @app.route('/confirm/<token>')
 def confirm_email(token):
@@ -124,7 +124,7 @@ def login():
 
     # If the user is already logged in
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard', id=current_user.id))
+        return redirect(url_for('dashboard'))
 
     form = LoginForm()
 
@@ -141,33 +141,32 @@ def login():
         # If the username doesn't exist
         if not user:
             error = 'That e-mail is not registered with an account.'
-            return render_template('login.html', error=error, form=form)
+            return render_template('login.html', error=error, form=form, user=current_user)
 
         # Check the provided password
         if user.validate_password(password):
             login_user(user)
             flash('Welcome, {}.'.format(user.first_name), 'success')
-            return redirect(url_for('dashboard', id=user.id))
+            return redirect(url_for('dashboard'))
 
         # If the password is incorrect
         else:
             error = 'Wrong password.'
-            return render_template('login.html', error=error, form=form)
+            return render_template('login.html', error=error, form=form, user=current_user)
 
     # If the user is making a GET request
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, user=current_user)
 
-@app.route('/dashboard/<int:id>')
+@app.route('/dashboard')
 @login_required
-def dashboard(id):
-    user = User.query.get(int(id))
-    return render_template('dashboard.html', name=user.first_name)
+def dashboard():
+    return render_template('dashboard.html', user=current_user)
 
 @app.route('/users')
 @login_required
 def show_all_users():
     users = User.query.order_by(User.id).all()
-    return render_template('users.html', users=users)
+    return render_template('users.html', user=current_user, users=users)
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required

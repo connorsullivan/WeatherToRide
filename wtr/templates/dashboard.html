@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    {{ name }}'s Dashboard
+    {{ user['first_name'] }}'s Dashboard
 {% endblock %}
 
 {% block body %}
@@ -9,7 +9,7 @@
     <div class="jumbotron text-center">
         <h1>Dashboard</h1><br>
         <p class="lead">
-            Welcome to your dashboard, {{ name }}!
+            Welcome to your dashboard, {{ user['first_name'] }}!
         </p>
     </div>
 
