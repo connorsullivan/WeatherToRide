@@ -1,30 +1,52 @@
 from flask_wtf import FlaskForm
+
 from wtforms import StringField, PasswordField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import Length, EqualTo
+from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 from .utilities.validators import Unique
 from .models import User
 
-class RegistrationForm(FlaskForm):
+class LoginForm(FlaskForm):
 
-    username = StringField('Username', [
-        Length(min=4, max=16), 
-        Unique(User, User.username, message='That username is not available.')
+    email = EmailField('Email Address', [
+        DataRequired()
     ])
 
     password = PasswordField('Password', [
-        Length(min=8), 
-        EqualTo('confirm', message='The passwords do not match.')
+        DataRequired()
     ])
 
-    confirm = PasswordField('Confirm Password')
+class RegistrationForm(FlaskForm):
 
     email = EmailField('Email Address', [
+        DataRequired(), 
+        Email(), 
         Unique(User, User.email, message='That e-mail address is already in use.')
     ])
 
+    password = PasswordField('Password', [
+        DataRequired(), 
+        Length(min=8, message='Your password must be at least 8 characters.')
+    ])
+
+    confirm = PasswordField('Confirm Password', [
+        DataRequired(), 
+        EqualTo('password', message='The passwords do not match.')
+    ])
+
+    first_name = StringField('First Name', [
+        DataRequired(), 
+        Length(max=16)
+    ])
+
+    last_name = StringField('Last Name', [
+        DataRequired(), 
+        Length(max=16)
+    ])
+
     phone = StringField('Phone Number', [
-        Length(min=10, max=10, message='Please enter a US phone number, including area code. Numbers only.'), 
+        DataRequired(), 
+        Length(min=10, max=10, message='Enter only digits, including area code.'), 
         Unique(User, User.phone, message='That phone number is already in use.')
     ])

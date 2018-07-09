@@ -6,18 +6,20 @@
 
 {% block body %}
 
-    <br><h1>Login</h1></br>
+    <br><h1>Login</h1><br>
+
+    {% from "includes/_form_helpers.html" import render_field %}
 
     <form method="POST">
 
+        {{ form.csrf_token }}
+
         <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" class="form-control" name="username" id="username" value={{request.form.username}}>
+            {{ render_field(form.email, class_="form-control") }}
         </div>
 
         <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" name="password" id="password" value={{request.form.password}}>
+            {{ render_field(form.password, class_="form-control") }}
         </div>
 
         <br>

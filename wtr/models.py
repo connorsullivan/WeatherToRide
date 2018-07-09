@@ -1,40 +1,44 @@
+from . import db
 from flask_login import UserMixin
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql import func
-from passlib.hash import argon2
 
-from . import db
+from passlib.hash import argon2
 
 class User(db.Model, UserMixin):
 
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
-    username = db.Column(db.String(16), nullable=False, unique=True)
-    _password = db.Column('password', db.String(73), nullable=False)
+    email = Column(String(40), nullable=False, unique=True)
+    email_confirmed = Column(Boolean, nullable=False, default=False)
 
-    email = db.Column(db.String(40), nullable=False, unique=True)
-    email_confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    _password = Column('password', String(73), nullable=False)
 
-    phone = db.Column(db.String(10), nullable=False, unique=True)
-    phone_confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    first_name = Column(String(40), nullable=False)
+    last_name = Column(String(40), nullable=False)
 
-    created = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
+    phone = Column(String(10), nullable=False, unique=True)
+    phone_confirmed = Column(Boolean, nullable=False, default=False)
+
+    created = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User {}>'.format(self.id)
 
-    # Map User.password to User._password
+    # Map password to _password
     @hybrid_property
     def password(self):
         return self._password
 
-    # Store the hash of a password, not the plaintext
+    # Hash the password before storing it
     @password.setter
     def password(self, plaintext):
         self._password = argon2.hash(plaintext)
 
-    # Validate a password with the stored hash
+    # Check a plaintext candidate against the stored hash
     def validate_password(self, plaintext):
         return argon2.verify(plaintext, self._password)

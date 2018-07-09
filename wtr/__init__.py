@@ -4,10 +4,10 @@ from flask_login import LoginManager
 
 app = Flask(__name__, instance_relative_config=True)
 
-# Load config.py from project root
+# Load config.py in project root
 app.config.from_object('config')
 
-# Load config.py from the `instance` folder
+# Load config.py in project /instance
 app.config.from_pyfile('config.py')
 
 # Flask-SQLAlchemy
@@ -20,4 +20,5 @@ lm.login_view = 'login'
 lm.login_message = 'Please log in first.'
 lm.login_message_category = 'danger'
 
+# Views for handling routes
 from . import views
