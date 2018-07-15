@@ -14,15 +14,13 @@
 * [Flask](http://flask.pocoo.org/) - The web framework
 * [MySQL](https://www.mysql.com/) - The database
 
-## Getting Started
-
-To get started with your own copy of this application, simply fork or clone this repository.
-
 ### Prerequisites & Installations
+
+It is good practice to run projects like this inside of isolated environments (such as a Python virtual environment or a virtual machine). I recommend using [Vagrant](https://www.vagrantup.com/), but Python's [venv](https://docs.python.org/3/library/venv.html) is also ok.
 
 WeatherToRide is built using [Python 3](https://www.python.org/).
 
-[Flask](http://flask.pocoo.org/) and its related dependencies can be added using pip.
+[Flask](http://flask.pocoo.org/) and its related dependencies can be added using pip (from the root directory of the project).
 
 ```
 pip install -r requirements.txt
@@ -58,21 +56,21 @@ If you wish to take advantage of the SendGrid and Twilio functionality, you will
 
 ### Running The Development Server
 
-Once you have the necessary software installed (see above), getting the development server running is very simple.
+The development server is intended to be used for development only (go figure). If you are planning on deploying this (or any) application in a production environment, use a more robust web server, such as Apache (or something similar).
 
-Open a terminal, navigate to the project root directory, and type the following command:
+To launch the development server, run the 'run.py' file in the root directory from a terminal.
 
 ```
 python run.py
 ```
 
-If you're using Linux or have different versions of Python installed on the same machine, you might need to use a slightly different command:
+If you're using Linux and/or have Python 2 installed on the same machine, you should use this command instead:
 
 ```
 python3 run.py
 ```
 
-The development server should launch and be available at http://localhost:5000/.
+The default settings will run the server on http://localhost:5000/, although this behavior can be changed by editing the 'run.py' file.
 
 ## Authors
 
