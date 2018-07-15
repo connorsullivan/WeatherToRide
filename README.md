@@ -30,6 +30,32 @@ pip install -r requirements.txt
 
 You'll also need a [MySQL server](https://www.mysql.com/) to store the data.
 
+Finally, you'll need to add an 'instance' folder to the root directory.
+
+```
+cd [root directory]
+mkdir instance
+```
+
+Inside of this instance folder, you'll need to add a 'config.py' file.
+
+```
+cd [root directory]/instance
+touch config.py
+```
+
+Inside of this config file, add at least the following values:
+
+```
+# This is used to encrypt session data (e.g. cookies)
+SECRET_KEY = 'put your secret key here'
+
+# This tells SQLALCHEMY how to connect to your database
+SQLALCHEMY_DATABASE_URI = "mysql+pymysql://[user]:[password]@[host]:[port]/[db]"
+```
+
+If you wish to take advantage of the SendGrid and Twilio functionality, you will need to add the API keys in this config file as well. Please consult the websites for these services to learn more.
+
 ### Running The Development Server
 
 Once you have the necessary software installed (see above), getting the development server running is very simple.
