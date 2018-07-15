@@ -7,6 +7,8 @@ from .utilities import email, sms, security
 
 from . import app, db, lm
 
+import sys
+
 # Reform '/route/' requests to '/route'
 @app.before_request
 def clear_trailing():
@@ -128,7 +130,7 @@ def login():
 
     form = LoginForm()
 
-    # If the user is submitting a login form
+    # If the user is submitting a valid form
     if form.validate_on_submit():
 
         # Get the form fields
@@ -146,6 +148,7 @@ def login():
         # Check the provided password
         if user.validate_password(password):
             login_user(user)
+            print('\n{} has logged in.\n'.format(user.email), file=sys.stderr)
             flash('Welcome, {}.'.format(user.first_name), 'success')
             return redirect(url_for('dashboard'))
 
@@ -153,6 +156,13 @@ def login():
         else:
             error = 'Wrong password.'
             return render_template('login.html', error=error, form=form, user=current_user)
+
+    # If there are errors in the submitted form
+    if form.errors:
+        print('\nError(s) in submitted LoginForm:\n', file=sys.stderr)
+        for fieldName, errorMessages in form.errors.items():
+            for err in errorMessages:
+                print(err + '\n', file=sys.stderr)
 
     # If the user is making a GET request
     return render_template('login.html', form=form, user=current_user)
@@ -171,14 +181,7 @@ def show_all_users():
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
+    print('\n{} has logged out.\n'.format(current_user.email), file=sys.stderr)
     logout_user()
     flash('You are now logged out.', 'success')
     return redirect(url_for('login'))
-
-@app.route('/test', methods=['GET', 'POST'])
-def test_route():
-    if request.method == 'POST':
-        return 'POST request: ' + request.form['test']
-    else:
-        return 'This route is for testing purposes. \
-                    POST form variable "test" to see it displayed here.'
