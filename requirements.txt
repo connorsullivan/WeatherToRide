@@ -1,8 +1,8 @@
-flask
 pymysql
+flask
 flask-sqlalchemy
-flask-wtf
 flask-login
+flask-wtf
 passlib
 argon2_cffi
 sendgrid
