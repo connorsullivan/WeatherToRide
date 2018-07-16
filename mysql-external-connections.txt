@@ -1,0 +1,36 @@
+Installing and configuring a MySQL server to accept external connections:
+
+1. Install MySQL Server
+
+    "sudo apt install mysql-server"
+
+2. Open the MySQL CLI.
+
+    "sudo mysql"
+
+3. Add a new user that will access the database externally:
+
+    "CREATE USER 'user'@'%' IDENTIFIED BY 'pass';"
+
+        - '%' is a wildcard. In this case, it allows this account to connect from anywhere, not just locally.
+
+4. Grant permissions to this newly added user.
+
+    "GRANT ALL PRIVILEGES ON *.* TO 'user'@'%' IDENTIFIED BY 'pass' WITH GRANT OPTION;"
+
+5. Flush privileges to ensure the changes take effect.
+
+    "FLUSH PRIVILEGES;"
+
+6. Navigate to /etc/mysql/mysql.conf.d/mysqld.cnf and comment out the following line:
+
+    bind-address = 127.0.0.1
+
+        - The bind-address field tells MySQL to only listen to the specified address for connections. 
+            By commenting it out, MySQL should now accept connections from any address.
+
+7. Restart MySQL.
+
+    "sudo /etc/init.d/mysql restart"
+
+*** If you are using Vagrant, make sure to forward port 3306 from the guest machine.

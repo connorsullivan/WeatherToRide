@@ -96,6 +96,13 @@ def register():
 
         return redirect(url_for('login'))
 
+    # If there are errors in the submitted form
+    if form.errors:
+        print('\nError(s) in submitted Registration form:\n', file=sys.stderr)
+        for fieldName, errorMessages in form.errors.items():
+            for err in errorMessages:
+                print(err + '\n', file=sys.stderr)
+
     return render_template('register.html', form=form, user=current_user)
 
 @app.route('/confirm/<token>')
@@ -159,7 +166,7 @@ def login():
 
     # If there are errors in the submitted form
     if form.errors:
-        print('\nError(s) in submitted LoginForm:\n', file=sys.stderr)
+        print('\nError(s) in submitted Login form:\n', file=sys.stderr)
         for fieldName, errorMessages in form.errors.items():
             for err in errorMessages:
                 print(err + '\n', file=sys.stderr)
