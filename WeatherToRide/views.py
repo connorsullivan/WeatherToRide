@@ -92,9 +92,11 @@ def register():
 
         # sms.send(user.phone, 'Thanks for trying my app!')
 
-        flash('Welcome, {}! You can now log in.'.format(user.first_name), 'success')
-
-        return redirect(url_for('login'))
+        # Log in the new user
+        login_user(user)
+        print('\n{} has created an account.\n'.format(user.email), file=sys.stderr)
+        flash('Welcome, {}.'.format(user.first_name), 'success')
+        return redirect(url_for('dashboard'))
 
     # If there are errors in the submitted form
     if form.errors:

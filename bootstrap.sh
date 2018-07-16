@@ -21,7 +21,7 @@ apt-get -y install apache2
 apt-get -y install mysql-server
 
 # Set up the database
-mysql < ${PROJECT_FOLDER}/instance/createDatabase.sql
+mysql < ${PROJECT_FOLDER}/mysql/createDatabase.sql
 
 # Python
 apt-get -y install python3
