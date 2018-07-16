@@ -32,37 +32,38 @@ cd WeatherToRide/instance
 touch config.py
 ```
 
-Inside of this config file, add at least the following values:
+Inside of this config file, add the following:
 
 ```
 # This is used to encrypt session data (e.g. cookies)
 SECRET_KEY = 'put some secure key here'
-
-# This tells SQLALCHEMY how to connect to your database
-SQLALCHEMY_DATABASE_URI = "mysql+pymysql://[user]:[password]@[host]:[port]/[db]"
 ```
 
 If you wish to take advantage of the SendGrid and Twilio functionality, you will need to add your API keys for these services in this config file as well.
 
+By default, this project will automatically create the WeatherToRide database (not the tables) and an administrative user, called "weather". The default password for the "weather" user is "password". Flask-SQLAlchemy uses this information to connect to the MySQL database. The default connection string is located in WeatherToRide/config.py. If you wish to change any of these values, make sure to edit this setting, shown below:
+
+```
+# Database connection string
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://weather:password@localhost:3306/WeatherToRide'
+```
+
+For added security, this connection string can be moved to WeatherToRide/instance/config.py. This will keep it from being added to your Git repository if you decide to fork this project.
+
+Lastly, you'll need to create the database tables. The easiest way to accomplish this is by running the development server (see below) and then stopping it with <kbd>Ctrl</kbd> + <kbd>C</kbd>.
+
 ### Running The Development Server
 
-The development server is intended to be used for development only (go figure). If you are planning on deploying this (or any) application in a production environment, use a more robust web server, such as Apache (or something similar).
-
-To launch the development server, run the 'run.py' file in the root directory from a terminal.
+To launch the development server, connect to the Vagrant machine and execute 'run.py' in the project root.
 
 ```
-python run.py
+vagrant ssh
+
+python3 /var/www/WeatherToRide/run.py
 ```
 
-If you're using Linux and/or have Python 2 installed on the same machine, you should use this command instead:
-
-```
-python3 run.py
-```
-
-The default settings will run the server on http://localhost:5000/, although this behavior can be changed by editing the 'run.py' file.
+The development server is available at http://localhost:5000/, although this can be changed by editing the 'run.py' file.
 
 ## Authors
 
 * **Gregory C. Sullivan**
-* **Branwin R. Dubose**
