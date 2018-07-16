@@ -64,6 +64,14 @@ python3 /var/www/WeatherToRide/run.py
 
 The development server is available at http://localhost:5000/, although this can be changed by editing the 'run.py' file.
 
+### Running The Production Server
+
+The production server should be available automatically after initializing the Vagrant project at http://localhost:8080/. If you make any changes and need to reload Apache, simply type the following:
+
+```
+sudo service apache2 restart
+```
+
 ## Authors
 
 * **Gregory C. Sullivan**
