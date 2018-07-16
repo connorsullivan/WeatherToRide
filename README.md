@@ -42,7 +42,7 @@ SECRET_KEY = 'put some secure key here'
 SQLALCHEMY_DATABASE_URI = "mysql+pymysql://[user]:[password]@[host]:[port]/[db]"
 ```
 
-If you wish to take advantage of the SendGrid and Twilio functionality, you will need to add your API keys for these services in this config file also.
+If you wish to take advantage of the SendGrid and Twilio functionality, you will need to add your API keys for these services in this config file as well.
 
 ### Running The Development Server
 
