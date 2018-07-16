@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder ".", "/var/www/WeatherToRide"
 
   config.vm.provider "virtualbox" do |vb|
-    vb.name = 'WeatherToRide'
+    vb.name = "WeatherToRide"
   end
 
   config.vm.provision :shell, path: "bootstrap.sh"
