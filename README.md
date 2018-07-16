@@ -16,29 +16,19 @@
 
 ### Prerequisites & Installations
 
-It is good practice to run projects like this inside of isolated environments (such as a Python virtual environment or a virtual machine). I recommend using [Vagrant](https://www.vagrantup.com/), but Python's [venv](https://docs.python.org/3/library/venv.html) is also ok.
+This repository is a ready-to-go (almost) Vagrant project! This means that getting up and running is very simple. Just make sure that you have [Vagrant](https://www.vagrantup.com/) installed on your machine.
 
-WeatherToRide is built using [Python 3](https://www.python.org/).
-
-[Flask](http://flask.pocoo.org/) and its related dependencies can be added using pip (from the root directory of the project).
+Before trying to run the Vagrant project, you'll need to add an "instance" folder to the root directory. This folder contains settings that I cannot provide for you (such as encryption and third-party API keys).
 
 ```
-pip install -r requirements.txt
-```
-
-You'll also need a [MySQL server](https://www.mysql.com/) to store the data.
-
-Finally, you'll need to add an 'instance' folder to the root directory.
-
-```
-cd [root directory]
+cd WeatherToRide
 mkdir instance
 ```
 
 Inside of this instance folder, you'll need to add a 'config.py' file.
 
 ```
-cd [root directory]/instance
+cd WeatherToRide/instance
 touch config.py
 ```
 
@@ -46,13 +36,13 @@ Inside of this config file, add at least the following values:
 
 ```
 # This is used to encrypt session data (e.g. cookies)
-SECRET_KEY = 'put your secret key here'
+SECRET_KEY = 'put some secure key here'
 
 # This tells SQLALCHEMY how to connect to your database
 SQLALCHEMY_DATABASE_URI = "mysql+pymysql://[user]:[password]@[host]:[port]/[db]"
 ```
 
-If you wish to take advantage of the SendGrid and Twilio functionality, you will need to add the API keys in this config file as well. Please consult the websites for these services to learn more.
+If you wish to take advantage of the SendGrid and Twilio functionality, you will need to add your API keys for these services in this config file also.
 
 ### Running The Development Server
 
