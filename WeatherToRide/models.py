@@ -1,15 +1,16 @@
 from . import db
 from flask_login import UserMixin
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, DECIMAL, ForeignKey, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from passlib.hash import argon2
 
 class User(db.Model, UserMixin):
 
-    __tablename__ = 'users'
+    __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
@@ -24,10 +25,9 @@ class User(db.Model, UserMixin):
     phone = Column(String(10), nullable=False, unique=True)
     phone_confirmed = Column(Boolean, nullable=False, default=False)
 
-    created = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    locations = relationship('Location', backref='user', lazy=True)
 
-    def __repr__(self):
-        return '<User {}>'.format(self.id)
+    created = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     # Map password to _password
     @hybrid_property
@@ -42,3 +42,17 @@ class User(db.Model, UserMixin):
     # Check a plaintext candidate against the stored hash
     def validate_password(self, plaintext):
         return argon2.verify(plaintext, self._password)
+
+class Location(db.Model):
+
+    __tablename__ = 'location'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    # Each location is tied to a user
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+
+    title = Column(String(40), nullable=False)
+
+    lat = Column(DECIMAL(precision=10, scale=6), nullable=False)
+    lng = Column(DECIMAL(precision=10, scale=6), nullable=False)

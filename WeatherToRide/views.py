@@ -1,8 +1,8 @@
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
-from .models import User
-from .forms import LoginForm, RegistrationForm
+from .models import User, Location
+from .forms import CommuteForm, LocationForm, LoginForm, RegistrationForm
 from .utilities import email, sms, security
 
 from . import app, db, lm
@@ -33,6 +33,60 @@ def index():
 @app.route('/about')
 def about():
     return render_template('about.html', user=current_user)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+    # If the user is already logged in
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
+    form = LoginForm()
+
+    # If the user is submitting a valid form
+    if form.validate_on_submit():
+
+        # Get the form fields
+        email = form.email.data
+        password = form.password.data
+
+        # Lookup the user in the database
+        user = User.query.filter_by(email=email).first()
+
+        # If the username doesn't exist
+        if not user:
+            error = 'That e-mail is not registered with an account.'
+            return render_template('login.html', user=current_user, error=error, form=form)
+
+        # Check the provided password
+        if user.validate_password(password):
+            login_user(user)
+            print('\n{} has logged in.\n'.format(user.email), file=sys.stderr)
+            flash('Welcome, {}.'.format(user.first_name), 'success')
+            return redirect(url_for('dashboard'))
+
+        # If the password is incorrect
+        else:
+            error = 'Wrong password.'
+            return render_template('login.html', user=current_user, error=error, form=form)
+
+    # If there are errors in the submitted form
+    if form.errors:
+        print('\nError(s) in submitted Login form:\n', file=sys.stderr)
+        for fieldName, errorMessages in form.errors.items():
+            for err in errorMessages:
+                print(err + '\n', file=sys.stderr)
+
+    # If the user is making a GET request
+    return render_template('login.html', user=current_user, form=form)
+
+@app.route('/logout', methods=['GET', 'POST'])
+@login_required
+def logout():
+    print('\n{} has logged out.\n'.format(current_user.email), file=sys.stderr)
+    logout_user()
+    flash('You are now logged out.', 'success')
+    return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -105,7 +159,7 @@ def register():
             for err in errorMessages:
                 print(err + '\n', file=sys.stderr)
 
-    return render_template('register.html', form=form, user=current_user)
+    return render_template('register.html', user=current_user, form=form)
 
 @app.route('/confirm/<token>')
 def confirm_email(token):
@@ -130,56 +184,45 @@ def confirm_email(token):
 
     return redirect(url_for('login'))
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
+def dashboard():
 
-    # If the user is already logged in
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
-
-    form = LoginForm()
+    form = LocationForm()
 
     # If the user is submitting a valid form
     if form.validate_on_submit():
 
-        # Get the form fields
-        email = form.email.data
-        password = form.password.data
+        # If the user has less than the maximum 3 locations
+        if len(current_user.locations) < 3:
 
-        # Lookup the user in the database
-        user = User.query.filter_by(email=email).first()
+            # Create the new location for this user
+            location = Location(
+                title=form.title.data,
+                lat=form.lat.data,
+                lng=form.lng.data,
+                user_id=current_user.id
+            )
 
-        # If the username doesn't exist
-        if not user:
-            error = 'That e-mail is not registered with an account.'
-            return render_template('login.html', error=error, form=form, user=current_user)
+            # Add the location to the database
+            db.session.add(location)
+            db.session.commit()
 
-        # Check the provided password
-        if user.validate_password(password):
-            login_user(user)
-            print('\n{} has logged in.\n'.format(user.email), file=sys.stderr)
-            flash('Welcome, {}.'.format(user.first_name), 'success')
+            print('\n{} has added a location.\n'.format(current_user.email), file=sys.stderr)
+            flash('Location added!', 'success')
             return redirect(url_for('dashboard'))
 
-        # If the password is incorrect
         else:
-            error = 'Wrong password.'
-            return render_template('login.html', error=error, form=form, user=current_user)
+            flash('Please remove an existing location before trying to add another.', 'danger')
 
     # If there are errors in the submitted form
     if form.errors:
-        print('\nError(s) in submitted Login form:\n', file=sys.stderr)
+        print('\nError(s) in submitted Location form:\n', file=sys.stderr)
         for fieldName, errorMessages in form.errors.items():
             for err in errorMessages:
                 print(err + '\n', file=sys.stderr)
 
-    # If the user is making a GET request
-    return render_template('login.html', form=form, user=current_user)
-
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('dashboard.html', user=current_user)
+    return render_template('dashboard.html', user=current_user, form=form)
 
 @app.route('/users')
 @login_required
@@ -187,10 +230,8 @@ def show_all_users():
     users = User.query.order_by(User.id).all()
     return render_template('users.html', user=current_user, users=users)
 
-@app.route('/logout', methods=['GET', 'POST'])
+@app.route('/commute/new')
 @login_required
-def logout():
-    print('\n{} has logged out.\n'.format(current_user.email), file=sys.stderr)
-    logout_user()
-    flash('You are now logged out.', 'success')
-    return redirect(url_for('login'))
+def add_commute():
+    form = CommuteForm()
+    return render_template('new_commute.html', user=current_user, form=form)

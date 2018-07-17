@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Add Commute
+{% endblock %}
+
+{% block body %}
+
+    <br><h1>Add Commute</h1><br>
+
+    {% from "includes/_form_helpers.html" import render_field %}
+
+    <form method="POST">
+
+        {{ form.csrf_token }}
+
+        <div class="form-group">
+            {{ render_field(form.departure_time, class_="form-control") }}
+        </div>
+
+        <br>
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+    </form>
+
+{% endblock %}
