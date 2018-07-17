@@ -54,7 +54,9 @@ Lastly, you'll need to create the tables inside of the existing database. The ea
 
 ### Running The Development Server
 
-The 'run.py' file launches the development server on http://localhost:5000/. In order to execute this file, type the following command from inside the Vagrant shell:
+The 'run.py' file launches the development server on http://localhost:5000/.
+
+To run this file, type the following from within the Vagrant shell:
 
 ```
 python3 /var/www/WeatherToRide/run.py
@@ -62,7 +64,11 @@ python3 /var/www/WeatherToRide/run.py
 
 ### Running The Production Server
 
-The production server should be available automatically after initializing the Vagrant project. In order to access it, navigate in a web browser to http://localhost:8080/. If you make any changes to server files and need to reload the production server, type the following command from inside the Vagrant shell:
+The production server should be available automatically after initializing the Vagrant project.
+
+In order to access it, navigate in a web browser to http://localhost:8080/.
+
+If you make any changes to server files and need to reload the production server, simply use:
 
 ```
 sudo service apache2 restart
