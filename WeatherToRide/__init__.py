@@ -20,5 +20,5 @@ lm.login_view = 'login'
 lm.login_message = 'Please log in first.'
 lm.login_message_category = 'danger'
 
-# Views for handling routes
+# Routing logic is stored in views.py
 from . import views

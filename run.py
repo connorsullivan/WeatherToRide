@@ -1,10 +1,5 @@
-'''
 
-This file should only be used to launch the development server.
-
-For production, use Apache or something similar.
-
-'''
+# This file should only be used to launch the development server.
 
 from WeatherToRide import app, db
 
