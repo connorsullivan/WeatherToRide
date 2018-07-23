@@ -1,11 +1,12 @@
+
 from flask_wtf import FlaskForm
 
-from wtforms import DecimalField, PasswordField, StringField
-from wtforms.fields.html5 import DecimalRangeField, EmailField, TelField, TimeField
+from wtforms import PasswordField, StringField, SubmitField
+from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
-from .utilities.validators import Unique
 from .models import User
+from .utils import Unique
 
 class LoginForm(FlaskForm):
 
@@ -50,23 +51,20 @@ class RegistrationForm(FlaskForm):
         Unique(User, User.phone, message='That phone number is already in use.')
     ])
 
-class CommuteForm(FlaskForm):
-
-    departure_time = TimeField('Departure Time', [
-        DataRequired()
-    ])
-
 class LocationForm(FlaskForm):
 
-    title = StringField('Title', [
-        DataRequired(),
-        Length(max=16)
-    ])
+    title = StringField( 
+        label = 'Name of this location', 
+        validators = [ DataRequired(), Length(max=32) ], 
+        render_kw = {"placeholder": "Ray's House"} 
+    )
 
-    lat = DecimalField('Latitude', [
-        DataRequired()
-    ])
+    address = StringField( 
+        label = 'Address', 
+        validators = [ DataRequired(), Length(max=255) ], 
+        render_kw={"placeholder": "1720 2nd Ave S, Birmingham, AL 35294"} 
+    )
 
-    lng = DecimalField('Longitude', [
-        DataRequired()
-    ])
+class DeleteForm(FlaskForm):
+
+    submit = SubmitField()

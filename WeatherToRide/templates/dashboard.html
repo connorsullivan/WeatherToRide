@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 
 {% block title %}
@@ -13,61 +14,25 @@
         </p>
     </div>
 
+    {% from "includes/_form_helpers.html" import render_field %}
+
     {% for location in user.locations %}
 
         <div class="jumbotron text-center">
-            <h1>{{ location.title }}</h1><br>
+            <form action="/locations/delete/{{location.id}}" method="POST">
+                {{ form.csrf_token }}
+                <h1>{{ location.title }}</h1><br>
+                {{ form.submit(class_="btn btn-danger", value="Remove") }}
+            </form>
         </div>
 
     {% endfor %}
 
     {% if user.locations|length < 3 %}
         <div class="jumbotron text-center">
-            <h1>Add Location</h1><br>
-            {% from "includes/_form_helpers.html" import render_field %}
-            <form method="POST">
-                {{ form.csrf_token }}
-                <div class="form-group">
-                    {{ render_field(form.title, class_="form-control") }}
-                </div>
-                <div class="form-group">
-                    {{ render_field(form.lat, class_="form-control", id="latField") }}
-                </div>
-                <div class="form-group">
-                    {{ render_field(form.lng, class_="form-control", id="lngField") }}
-                </div>
-                <br>
-                <button type="button" class="btn btn-success" onclick="getLocation()">Use Current Location</button>
-                <br><br>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+            <a href="{{ url_for('create_location') }}" 
+                class="btn btn-primary btn-lg" role="button">Add Location</a>
         </div>
     {% endif %}
-
-{% endblock %}
-
-{% block script %}
-
-    <!-- Adapted from: https://www.w3schools.com/htmL/html5_geolocation.asp -->
-
-    <script>
-
-        var latField = document.getElementById("latField");
-        var lngField = document.getElementById("lngField");
-        
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
-            } else { 
-                alert("Geolocation is not supported by this browser.");
-            }
-        }
-        
-        function showPosition(position) {
-            latField.value = position.coords.latitude;
-            lngField.value = position.coords.longitude;
-        }
-
-    </script>
 
 {% endblock %}

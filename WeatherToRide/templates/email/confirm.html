@@ -1,19 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
+{% extends 'base.html' %}
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+{% block title %}
+    Confirm Your E-mail Address
+{% endblock %}
 
-    <title>Confirm Your E-mail Address</title>
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
-
-</head>
-
-<body>
+{% block body %}
 
     <div class="jumbotron text-center">
         <h1>Hello, {{ user.first_name }}!</h1>
@@ -22,11 +14,7 @@
             Thanks for riding with us. Click below to confirm your e-mail address.
         </p>
         <br>
-        <a href="{{ confirm_url }}" class="btn btn-primary btn-lg" role="button">Confirm E-mail Address</a>
+        <a href="{{ confirm_url }}" class="btn btn-primary btn-lg" role="button">Confirm</a>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-
-</body>
-
-</html>
+{% endblock %}

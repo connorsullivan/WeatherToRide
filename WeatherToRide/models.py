@@ -1,4 +1,6 @@
+
 from . import db
+
 from flask_login import UserMixin
 
 from sqlalchemy import Boolean, Column, DateTime, DECIMAL, ForeignKey, Integer, String
@@ -49,10 +51,21 @@ class Location(db.Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
-    # Each location is tied to a user
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
     title = Column(String(40), nullable=False)
 
     lat = Column(DECIMAL(precision=10, scale=6), nullable=False)
     lng = Column(DECIMAL(precision=10, scale=6), nullable=False)
+
+class Forecast(db.Model):
+
+    __tablename__ = 'forecast'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    location_id = Column(Integer, ForeignKey('location.id'), nullable=False)
+
+    icon = Column(String(19), nullable=False)
+
+    updated = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
