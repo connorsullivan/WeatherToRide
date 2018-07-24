@@ -21,8 +21,6 @@ class Location(db.Model):
     lat = Column(DECIMAL(precision=10, scale=6), nullable=False)
     lng = Column(DECIMAL(precision=10, scale=6), nullable=False)
 
-    weather = relationship('Weather', backref='location', lazy=True, uselist=False)
-
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
 class Route(db.Model):
