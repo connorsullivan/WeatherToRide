@@ -4,7 +4,6 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, SelectField, StringField, SubmitField
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
-from wtforms_sqlalchemy.fields import QuerySelectField
 
 from .models import User, Location
 from .utils import Unique
