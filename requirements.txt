@@ -3,8 +3,8 @@ flask
 flask-sqlalchemy
 flask-login
 flask-wtf
+wtforms-sqlalchemy
 passlib
 argon2_cffi
 sendgrid
 twilio
-googlemaps

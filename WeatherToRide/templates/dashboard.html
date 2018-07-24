@@ -2,37 +2,45 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    {{ user['first_name'] }}'s Dashboard
+    {{ user.name }}'s Dashboard
 {% endblock %}
 
 {% block body %}
 
     <div class="jumbotron text-center">
-        <h1>Dashboard</h1><br>
-        <p class="lead">
-            Welcome to your dashboard, {{ user['first_name'] }}!
-        </p>
+        <h1>Hi, {{ user.name }}.</h1><br><br>
+        <div class="btn-group">
+            <a href="{{ url_for('create_location') }}" 
+                class="btn btn-success btn-lg" role="button">+ Location</a>
+            <a href="{{ url_for('create_route') }}" 
+                class="btn btn-primary btn-lg" role="button">+ Route</a>
+        </div>
     </div>
 
     {% from "includes/_form_helpers.html" import render_field %}
 
-    {% for location in user.locations %}
+    {% for location in locations %}
 
         <div class="jumbotron text-center">
-            <form action="/locations/delete/{{location.id}}" method="POST">
+            <form action="{{ url_for('delete_location', id=location.id) }}" method="POST">
                 {{ form.csrf_token }}
-                <h1>{{ location.title }}</h1><br>
+                <h1>{{ location.name }}</h1><br>
                 {{ form.submit(class_="btn btn-danger", value="Remove") }}
             </form>
         </div>
 
     {% endfor %}
 
-    {% if user.locations|length < 3 %}
+    {% for route in routes %}
+
         <div class="jumbotron text-center">
-            <a href="{{ url_for('create_location') }}" 
-                class="btn btn-primary btn-lg" role="button">Add Location</a>
+            <form action="{{ url_for('delete_route', id=route.id) }}" method="POST">
+                {{ form.csrf_token }}
+                <h1>{{ route.name }}</h1><br>
+                {{ form.submit(class_="btn btn-danger", value="Remove") }}
+            </form>
         </div>
-    {% endif %}
+
+    {% endfor %}
 
 {% endblock %}

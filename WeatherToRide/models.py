@@ -10,24 +10,51 @@ from sqlalchemy.sql import func
 
 from passlib.hash import argon2
 
+class Location(db.Model):
+
+    __tablename__ = 'location'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    name = Column(String(32), nullable=False)
+
+    lat = Column(DECIMAL(precision=10, scale=6), nullable=False)
+    lng = Column(DECIMAL(precision=10, scale=6), nullable=False)
+
+    weather = relationship('Weather', backref='location', lazy=True, uselist=False)
+
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+
+class Route(db.Model):
+
+    __tablename__ = 'route'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    name = Column(String(32), nullable=False)
+
+    start = Column(Integer, ForeignKey('location.id'), nullable=False)
+    final = Column(Integer, ForeignKey('location.id'), nullable=False)
+
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+
 class User(db.Model, UserMixin):
 
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
-    email = Column(String(40), nullable=False, unique=True)
+    email = Column(String(32), nullable=False, unique=True)
     email_confirmed = Column(Boolean, nullable=False, default=False)
 
     _password = Column('password', String(73), nullable=False)
 
-    first_name = Column(String(40), nullable=False)
-    last_name = Column(String(40), nullable=False)
+    name = Column(String(32), nullable=False)
 
     phone = Column(String(10), nullable=False, unique=True)
     phone_confirmed = Column(Boolean, nullable=False, default=False)
 
-    locations = relationship('Location', backref='user', lazy=True)
+    locations = relationship('Location', backref='owner', lazy=True)
 
     created = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
@@ -45,27 +72,14 @@ class User(db.Model, UserMixin):
     def validate_password(self, plaintext):
         return argon2.verify(plaintext, self._password)
 
-class Location(db.Model):
+class Weather(db.Model):
 
-    __tablename__ = 'location'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-
-    title = Column(String(40), nullable=False)
-
-    lat = Column(DECIMAL(precision=10, scale=6), nullable=False)
-    lng = Column(DECIMAL(precision=10, scale=6), nullable=False)
-
-class Forecast(db.Model):
-
-    __tablename__ = 'forecast'
+    __tablename__ = 'weather'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
-    location_id = Column(Integer, ForeignKey('location.id'), nullable=False)
-
-    icon = Column(String(19), nullable=False)
+    icon = Column(String(32), nullable=False)
 
     updated = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    location_id = Column(Integer, ForeignKey('location.id'), nullable=False)

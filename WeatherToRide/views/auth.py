@@ -35,7 +35,7 @@ def login():
             if user.validate_password(password):
                 login_user(user)
                 print(f'\n{current_user.email} has logged in.\n', file=sys.stderr)
-                flash(f'Welcome, {current_user.first_name}.', 'success')
+                flash(f'Welcome, {current_user.name}.', 'success')
                 return redirect(url_for('dashboard'))
 
             else:
@@ -78,8 +78,7 @@ def register():
         user = User(
             email=form.email.data, 
             password=form.password.data, 
-            first_name=form.first_name.data, 
-            last_name=form.last_name.data, 
+            name=form.name.data, 
             phone=form.phone.data
         )
 

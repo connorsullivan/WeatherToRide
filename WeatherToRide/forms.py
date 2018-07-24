@@ -1,16 +1,17 @@
 
 from flask_wtf import FlaskForm
 
-from wtforms import PasswordField, StringField, SubmitField
+from wtforms import PasswordField, SelectField, StringField, SubmitField
 from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
+from wtforms_sqlalchemy.fields import QuerySelectField
 
-from .models import User
+from .models import User, Location
 from .utils import Unique
 
 class LoginForm(FlaskForm):
 
-    email = EmailField('Email Address', [
+    email = EmailField('Email address', [
         DataRequired()
     ])
 
@@ -20,9 +21,10 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
 
-    email = EmailField('Email Address', [
+    email = EmailField('Email address', [
         DataRequired(), 
         Email(), 
+        Length(max=32), 
         Unique(User, User.email, message='That e-mail address is already in use.')
     ])
 
@@ -31,29 +33,25 @@ class RegistrationForm(FlaskForm):
         Length(min=8, message='Your password must be at least 8 characters.')
     ])
 
-    confirm = PasswordField('Confirm Password', [
+    confirm = PasswordField('Confirm password', [
         DataRequired(), 
         EqualTo('password', message='The passwords do not match.')
     ])
 
-    first_name = StringField('First Name', [
+    name = StringField('First name', [
         DataRequired(), 
-        Length(max=16)
+        Length(max=32)
     ])
 
-    last_name = StringField('Last Name', [
+    phone = TelField('Phone number', [
         DataRequired(), 
-        Length(max=16)
-    ])
-
-    phone = TelField('Phone Number', [
-        DataRequired(), 
+        Length(max=10), 
         Unique(User, User.phone, message='That phone number is already in use.')
     ])
 
 class LocationForm(FlaskForm):
 
-    title = StringField( 
+    name = StringField( 
         label = 'Name of this location', 
         validators = [ DataRequired(), Length(max=32) ], 
         render_kw = {"placeholder": "Ray's House"} 
@@ -64,6 +62,17 @@ class LocationForm(FlaskForm):
         validators = [ DataRequired(), Length(max=255) ], 
         render_kw={"placeholder": "1720 2nd Ave S, Birmingham, AL 35294"} 
     )
+
+class RouteForm(FlaskForm):
+
+    name = StringField( 
+        label = 'Name of this route', 
+        validators = [ DataRequired(), Length(max=32) ], 
+        render_kw = {'placeholder': 'Work commute'} 
+    )
+
+    start = SelectField('Start destination', coerce=int, validators=[DataRequired()])
+    final = SelectField('Final destination', coerce=int, validators=[DataRequired()])
 
 class DeleteForm(FlaskForm):
 
