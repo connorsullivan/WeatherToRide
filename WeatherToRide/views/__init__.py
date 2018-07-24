@@ -1,7 +1,7 @@
 
 from .. import app
 
-from ..forms import DeleteForm
+from ..forms import SubmitForm
 from ..models import Location, Route, User
 
 from flask import render_template
@@ -20,7 +20,7 @@ def about():
 def dashboard():
 
     # Form for deleting locations and routes
-    form = DeleteForm()
+    form = SubmitForm()
 
     # Locations for this user
     locations = Location.query.filter_by(user_id=current_user.id)
@@ -37,5 +37,5 @@ def show_all_users():
     return render_template('users.html', user=current_user, users=users)
 
 from . import auth
-from . import locations
-from . import routes
+from . import location
+from . import route

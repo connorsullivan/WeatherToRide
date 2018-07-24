@@ -1,10 +1,10 @@
 
 from .. import app, db
 
-from ..forms import DeleteForm, RouteForm
+from ..forms import RouteForm, SubmitForm
 from ..models import Location, Route
 
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 import sys
@@ -58,13 +58,50 @@ def create_route():
             for err in errorMessages:
                 print(f'* {err}\n', file=sys.stderr)
 
-    return render_template('location/route.html', user=current_user, form=form)
+    return render_template('route/route.html', user=current_user, form=form)
 
-@app.route('/routes/delete/<int:id>', methods=['POST'])
+@app.route('/route/update/<int:id>', methods=['GET', 'POST'])
+@login_required
+def update_route(id):
+
+    # Get the route to be edited from the database
+    route = Route.query.get(int(id))
+
+    # Create a form with the pre-existing values already populated
+    form = RouteForm(name=route.name, start=route.start, final=route.final)
+
+    # Choices for the location selector fields
+    form.start.choices = [(c.id, c.name) for c in Location.query.filter_by(user_id=current_user.id)]
+    form.final.choices = [(c.id, c.name) for c in Location.query.filter_by(user_id=current_user.id)]
+
+    # If the user is submitting a valid form
+    if form.validate_on_submit():
+
+        # Update the route in the database
+        route.name = form.name.data
+        route.start = form.start.data
+        route.final = form.final.data
+
+        # Save the changes
+        db.session.commit()
+
+        flash('The route was successfully updated!', 'success')
+        return redirect(url_for('dashboard'))
+
+    # If the submitted form has error(s)
+    if form.errors:
+        print('\nError(s) detected in submitted form:\n', file=sys.stderr)
+        for fieldName, errorMessages in form.errors.items():
+            for err in errorMessages:
+                print(f'* {err}\n', file=sys.stderr)
+
+    return render_template('route/route.html', user=current_user, form=form)
+
+@app.route('/route/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_route(id):
 
-    form = DeleteForm()
+    form = SubmitForm()
 
     # If the user is submitting a valid form
     if form.validate_on_submit():

@@ -11,39 +11,38 @@ mkdir ${PROJECT_FOLDER}
 export DEBIAN_FRONTEND=noninteractive
 
 # Prepare for package installations
-apt-get update
-apt-get -y upgrade
+sudo apt-get update
+sudo apt-get -y upgrade
 
 # Apache
-apt-get -y install apache2
+sudo apt-get -y install apache2
 
 # MySQL
-apt-get -y install mysql-server
+sudo apt-get -y install mysql-server
 
 # Set up the database
-mysql < ${PROJECT_FOLDER}/db/createDatabase.sql
-mysql < ${PROJECT_FOLDER}/db/createUser.sql
+sudo mysql < ${PROJECT_FOLDER}/db/createDatabase.sql
+sudo mysql < ${PROJECT_FOLDER}/db/createUser.sql
 
 # Python
-apt-get -y install python3
+sudo apt-get -y install python3 python3-dev python3-pip
 
-# Pip
-apt-get -y install python3-pip
+# Upgrade pip
 sudo -H pip3 install --upgrade pip
 
-# Install Python package requirements with Pip
-pip3 install -r ${PROJECT_FOLDER}/requirements.txt
+# Install Python packages w/ pip
+sudo pip3 install -r ${PROJECT_FOLDER}/requirements.txt
 
 # Install and enable mod_wsgi
-apt-get -y install libapache2-mod-wsgi-py3 python3-dev
-a2enmod wsgi
+sudo apt-get -y install libapache2-mod-wsgi-py3
+sudo a2enmod wsgi
 
-# Copy the VirtualHost file to the appropriate location
-cp ${PROJECT_FOLDER}/${PROJECT_NAME}.conf /etc/apache2/sites-available/${PROJECT_NAME}.conf
+# Copy the new VirtualHost file to the appropriate location
+sudo cp ${PROJECT_FOLDER}/${PROJECT_NAME}.conf /etc/apache2/sites-available/${PROJECT_NAME}.conf
 
 # Disable the default VirtualHost file and enable the new one
-a2dissite 000-default
-a2ensite ${PROJECT_NAME}.conf
+sudo a2dissite 000-default
+sudo a2ensite ${PROJECT_NAME}.conf
 
 # Restart Apache
-service apache2 restart
+sudo service apache2 restart

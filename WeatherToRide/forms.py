@@ -73,6 +73,6 @@ class RouteForm(FlaskForm):
     start = SelectField('Start destination', coerce=int, validators=[DataRequired()])
     final = SelectField('Final destination', coerce=int, validators=[DataRequired()])
 
-class DeleteForm(FlaskForm):
+class SubmitForm(FlaskForm):
 
     submit = SubmitField()

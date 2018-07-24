@@ -25,7 +25,14 @@
             <form action="{{ url_for('delete_location', id=location.id) }}" method="POST">
                 {{ form.csrf_token }}
                 <h1>{{ location.name }}</h1><br>
-                {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                <p class="lead">
+                    ( {{ location.lat }} , {{ location.lng }} )
+                </p><br>
+                <div class="btn-group">
+                    <a href="{{ url_for('update_location', id=location.id) }}" 
+                        class="btn btn-primary" role="button">Update</a>
+                    {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                </div>
             </form>
         </div>
 
@@ -37,7 +44,14 @@
             <form action="{{ url_for('delete_route', id=route.id) }}" method="POST">
                 {{ form.csrf_token }}
                 <h1>{{ route.name }}</h1><br>
-                {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                <p class="lead">
+                    ( {{ route.start }} -> {{ route.final }} )
+                </p><br>
+                <div class="btn-group">
+                    <a href="{{ url_for('update_route', id=route.id) }}" 
+                        class="btn btn-primary" role="button">Update</a>
+                    {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                </div>
             </form>
         </div>
 
