@@ -7,6 +7,7 @@ from ..models import Location, Route
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
+import datetime
 import sys
 
 MAX_ROUTES = 3
@@ -34,11 +35,16 @@ def create_route():
         # If the user doesn't have too many routes
         if len(routes) < MAX_ROUTES:
 
+            # Combine the collected time with today's date
+            today = datetime.date.today()
+            time = datetime.datetime.combine(today, form.time.data)
+
             # Create a new route in the database
             route = Route( 
                 name = form.name.data, 
                 start = form.start.data, 
                 final = form.final.data, 
+                time = time, 
                 user_id = current_user.id 
             )
 
@@ -68,7 +74,7 @@ def update_route(id):
     route = Route.query.get(int(id))
 
     # Create a form with the pre-existing values already populated
-    form = RouteForm(name=route.name, start=route.start, final=route.final)
+    form = RouteForm(name=route.name, start=route.start, final=route.final, time=route.time)
 
     # Choices for the location selector fields
     form.start.choices = [(c.id, c.name) for c in Location.query.filter_by(user_id=current_user.id)]
@@ -77,10 +83,15 @@ def update_route(id):
     # If the user is submitting a valid form
     if form.validate_on_submit():
 
+        # Combine the collected time with today's date
+        today = datetime.date.today()
+        time = datetime.datetime.combine(today, form.time.data)
+
         # Update the route in the database
         route.name = form.name.data
         route.start = form.start.data
         route.final = form.final.data
+        route.time = time
 
         # Save the changes
         db.session.commit()

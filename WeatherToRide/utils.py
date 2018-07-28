@@ -34,14 +34,23 @@ def forecast(latitude, longitude):
 
     url = f'https://api.darksky.net/forecast/{key}/{latitude},{longitude}'
 
-    # Call the Dark Sky API
-    r = req.get(url)
+    # Query the Dark Sky API
+    try:
+        response = req.get(url).json()['daily']['data']
+    except:
+        return None
 
-    # Extract the JSON response
-    response = r.json()
+    # Make sure all of the data was received
+    if len(response) < 8:
+        return None
 
-    # Return the current weather
-    return response["currently"]["icon"]
+    # Assemble the information into a list
+    weather = []
+    for day in response:
+        weather.append( day['icon'] )
+
+    # Return the forecast
+    return weather
 
 from wtforms.validators import ValidationError
 

@@ -1,12 +1,20 @@
 
 from flask_wtf import FlaskForm
 
-from wtforms import PasswordField, SelectField, StringField, SubmitField
-from wtforms.fields.html5 import EmailField, TelField
+from wtforms import PasswordField, SelectField, SelectMultipleField, StringField, SubmitField
+from wtforms.fields.html5 import EmailField, TelField, TimeField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
+from wtforms.widgets import CheckboxInput, ListWidget
 
 from .models import User, Location
 from .utils import Unique
+
+import datetime
+
+class MultiCheckboxField(SelectMultipleField):
+
+    widget = ListWidget(prefix_label=False)
+    option_widget = CheckboxInput()
 
 class LoginForm(FlaskForm):
 
@@ -72,6 +80,18 @@ class RouteForm(FlaskForm):
 
     start = SelectField('Start destination', coerce=int, validators=[DataRequired()])
     final = SelectField('Final destination', coerce=int, validators=[DataRequired()])
+
+    time = TimeField('Departure time')
+
+    days = MultiCheckboxField('Days of week', coerce=int, choices=[
+        (0, 'Monday'), 
+        (1, 'Tuesday'), 
+        (2, 'Wednesday'), 
+        (3, 'Thursday'), 
+        (4, 'Friday'), 
+        (5, 'Saturday'), 
+        (6, 'Sunday')
+    ])
 
 class SubmitForm(FlaskForm):
 

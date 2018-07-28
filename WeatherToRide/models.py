@@ -10,31 +10,7 @@ from sqlalchemy.sql import func
 
 from passlib.hash import argon2
 
-class Location(db.Model):
-
-    __tablename__ = 'location'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-
-    name = Column(String(32), nullable=False)
-
-    lat = Column(DECIMAL(precision=10, scale=6), nullable=False)
-    lng = Column(DECIMAL(precision=10, scale=6), nullable=False)
-
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-
-class Route(db.Model):
-
-    __tablename__ = 'route'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-
-    name = Column(String(32), nullable=False)
-
-    start = Column(Integer, ForeignKey('location.id'), nullable=False)
-    final = Column(Integer, ForeignKey('location.id'), nullable=False)
-
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+import datetime
 
 class User(db.Model, UserMixin):
 
@@ -52,7 +28,9 @@ class User(db.Model, UserMixin):
     phone = Column(String(10), nullable=False, unique=True)
     phone_confirmed = Column(Boolean, nullable=False, default=False)
 
-    locations = relationship('Location', backref='owner', lazy=True)
+    locations = relationship('Location', backref='user', lazy=True)
+
+    routes = relationship('Route', backref='user', lazy=True)
 
     created = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
@@ -70,14 +48,56 @@ class User(db.Model, UserMixin):
     def validate_password(self, plaintext):
         return argon2.verify(plaintext, self._password)
 
+class Location(db.Model):
+
+    __tablename__ = 'location'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+
+    name = Column(String(32), nullable=False)
+
+    lat = Column(DECIMAL(precision=10, scale=6), nullable=False)
+    lng = Column(DECIMAL(precision=10, scale=6), nullable=False)
+
+    weather = relationship('Weather', backref='location', lazy=True, uselist=False)
+
+class Route(db.Model):
+
+    __tablename__ = 'route'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+
+    name = Column(String(32), nullable=False)
+
+    start = Column(Integer, ForeignKey('location.id'), nullable=False)
+    final = Column(Integer, ForeignKey('location.id'), nullable=False)
+
+    time = Column(DateTime(timezone=True), nullable=False)
+
 class Weather(db.Model):
 
     __tablename__ = 'weather'
 
+    def update(self):
+        self.updated = datetime.datetime.now()
+        db.session.add(self)
+        db.session.commit()
+
     id = Column(Integer, primary_key=True, autoincrement=True)
 
-    icon = Column(String(32), nullable=False)
-
-    updated = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-
     location_id = Column(Integer, ForeignKey('location.id'), nullable=False)
+
+    day_0 = Column(String(32))
+    day_1 = Column(String(32))
+    day_2 = Column(String(32))
+    day_3 = Column(String(32))
+    day_4 = Column(String(32))
+    day_5 = Column(String(32))
+    day_6 = Column(String(32))
+    day_7 = Column(String(32))
+
+    updated = Column(DateTime(timezone=True))

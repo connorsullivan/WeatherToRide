@@ -1,5 +1,5 @@
 
-from .. import app, utils
+from .. import app, db, utils
 
 from ..forms import LoginForm, RegistrationForm
 from ..models import User

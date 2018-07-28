@@ -1,8 +1,8 @@
 
 from .. import app, db, utils
 
-from ..forms import LocationForm, SubmitForm
-from ..models import Location, Route
+from ..forms import *
+from ..models import *
 
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -11,7 +11,55 @@ from sqlalchemy.exc import IntegrityError
 
 import sys
 
-MAX_LOCATIONS = 3
+MAX_LOCATIONS = 5
+
+icon_map = {
+
+    'clear-day': 'wi-day-sunny', 
+    'clear-night': 'wi-night-clear', 
+    'rain': 'wi-rain', 
+    'snow': 'wi-snow', 
+    'sleet': 'wi-sleet', 
+    'wind': 'wi-windy', 
+    'fog': 'wi-fog', 
+    'cloudy': 'wi-cloud', 
+    'partly-cloudy-day': 'wi-day-cloudy', 
+    'partly-cloudy-night': 'wi-night-partly-cloudy'
+
+}
+
+def getWeatherForLocation(location):
+
+    # Get the weekly forecast for this location
+    weeklyForecast = utils.forecast(location.lat, location.lng)
+
+    # Map the forecast to icons that display the weather conditions
+    weeklyForecastIcons = []
+
+    for day in weeklyForecast:
+        try:
+            weeklyForecastIcons.append(icon_map[day])
+        except:
+            weeklyForecastIcons.append(None)
+
+    # Create or update the entry in the Weather table
+    try:
+        weather = Weather.query.filter_by(location_id=location.id).one()
+    except:
+        weather = Weather(location_id=location.id)
+
+    weather.day_0 = weeklyForecastIcons[0]
+    weather.day_1 = weeklyForecastIcons[1]
+    weather.day_2 = weeklyForecastIcons[2]
+    weather.day_3 = weeklyForecastIcons[3]
+    weather.day_4 = weeklyForecastIcons[4]
+    weather.day_5 = weeklyForecastIcons[5]
+    weather.day_6 = weeklyForecastIcons[6]
+    weather.day_7 = weeklyForecastIcons[7]
+
+    # Commit the changes to the database
+    db.session.add(weather)
+    db.session.commit()
 
 @app.route('/location/create', methods=['GET', 'POST'])
 @login_required
@@ -56,6 +104,9 @@ def create_location():
 
                 db.session.add(location)
                 db.session.commit()
+
+                # Get the weather for this location
+                getWeatherForLocation(location)
 
                 flash('The location was successfully added!', 'success')
                 return redirect(url_for('dashboard'))
@@ -116,6 +167,9 @@ def update_location(id):
 
             # Save the updated location information to the database
             db.session.commit()
+
+            # Get the weather information for this updated location
+            getWeatherForLocation(location)
 
             flash('The location was successfully updated!', 'success')
             return redirect(url_for('dashboard'))

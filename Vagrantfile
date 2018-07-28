@@ -14,6 +14,6 @@ Vagrant.configure("2") do |config|
     vb.name = "WeatherToRide"
   end
 
-  config.vm.provision :shell, path: "provision.sh"
+  config.vm.provision "shell", path: "provision.sh"
 
 end

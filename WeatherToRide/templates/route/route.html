@@ -5,13 +5,17 @@
     Add Route
 {% endblock %}
 
+{% block style %}
+    <style> ul { list-style-type: none; } </style>
+{% endblock %}
+
 {% block body %}
 
     <br><h1>Route</h1><br>
 
     {% from "includes/_form_helpers.html" import render_field %}
 
-    <form method="POST">
+    <form method="POST" action="/post">
 
         {{ form.csrf_token }}
 
@@ -25,6 +29,14 @@
 
         <div class="form-group">
             {{ render_field( form.final, class_="form-control" ) }}
+        </div>
+
+        <div class="form-group">
+            {{ render_field( form.time, class_="form-control" ) }}
+        </div>
+
+        <div class="form-group">
+            {{ render_field( form.days, class_="form-control" ) }}
         </div>
 
         <br>
