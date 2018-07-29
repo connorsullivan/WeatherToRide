@@ -38,12 +38,12 @@ lm.login_message = 'Please log in first.'
 lm.login_message_category = 'danger'
 
 # Import the User model
-from .models import User
+from . import models
 
 # Tell Flask-Login how to load users from the database
 @lm.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    return models.User.query.get(int(id))
 
 # Routing logic is stored in views package
 from .views import *

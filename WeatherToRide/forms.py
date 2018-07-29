@@ -1,13 +1,12 @@
 
+from . import models
+
 from flask_wtf import FlaskForm
 
 from wtforms import PasswordField, SelectField, SelectMultipleField, StringField, SubmitField
 from wtforms.fields.html5 import EmailField, TelField, TimeField
-from wtforms.validators import DataRequired, Email, EqualTo, Length
+from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from wtforms.widgets import CheckboxInput, ListWidget
-
-from .models import User, Location
-from .utils import Unique
 
 import datetime
 
@@ -15,6 +14,18 @@ class MultiCheckboxField(SelectMultipleField):
 
     widget = ListWidget(prefix_label=False)
     option_widget = CheckboxInput()
+
+class Unique(object):
+
+    def __init__(self, model, field, message='This element already exists.'):
+        self.model = model
+        self.field = field
+        self.message = message
+
+    def __call__(self, form, field):
+        check = self.model.query.filter(self.field == field.data).first()
+        if check:
+            raise ValidationError(self.message)
 
 class LoginForm(FlaskForm):
 
@@ -32,7 +43,7 @@ class RegistrationForm(FlaskForm):
         DataRequired(), 
         Email(), 
         Length(max=32), 
-        Unique(User, User.email, message='That e-mail address is already in use.')
+        Unique(models.User, models.User.email, message='That e-mail address is already in use.')
     ])
 
     password = PasswordField('Password', [
@@ -53,7 +64,7 @@ class RegistrationForm(FlaskForm):
     phone = TelField('Phone number', [
         DataRequired(), 
         Length(max=10), 
-        Unique(User, User.phone, message='That phone number is already in use.')
+        Unique(models.User, models.User.phone, message='That phone number is already in use.')
     ])
 
 class LocationForm(FlaskForm):

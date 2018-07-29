@@ -1,13 +1,9 @@
 
-from .. import app, db
-
-from ..forms import RouteForm, SubmitForm
-from ..models import Location, Route
+from .. import app, db, forms, models
 
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-import datetime
 import sys
 
 MAX_ROUTES = 3
@@ -16,132 +12,146 @@ MAX_ROUTES = 3
 @login_required
 def create_route():
 
-    # If the user doesn't have enough locations to create a route
+    # Check that the user has enough locations to make a route
     if len(current_user.locations) < 2:
         flash('You must have at least 2 saved locations before creating a route.', 'danger')
         return redirect(url_for('dashboard'))
 
-    form = RouteForm()
+    # Get a RouteForm from forms.py
+    form = forms.RouteForm()
 
-    form.start.choices = [(c.id, c.name) for c in Location.query.filter_by(user_id=current_user.id)]
-    form.final.choices = [(c.id, c.name) for c in Location.query.filter_by(user_id=current_user.id)]
+    # Get the user's locations
+    locations = models.Location.query.filter_by(user_id=current_user.id)
 
-    # If the user is submitting a valid form
+    form.start.choices = [(x.id, x.name) for x in locations]
+    form.final.choices = [(x.id, x.name) for x in locations]
+
+    # If a valid RouteForm was submitted
     if form.validate_on_submit():
 
-        # See how many routes this user already has
-        routes = Route.query.filter_by(user_id=current_user.id).all()
+        # Get the user's routes
+        routes = models.Route.query.filter_by(user_id=current_user.id).all()
 
         # If the user doesn't have too many routes
         if len(routes) < MAX_ROUTES:
 
-            # Combine the collected time with today's date
-            today = datetime.date.today()
-            time = datetime.datetime.combine(today, form.time.data)
-
             # Create a new route in the database
-            route = Route( 
-                name = form.name.data, 
-                start = form.start.data, 
-                final = form.final.data, 
-                time = time, 
-                user_id = current_user.id 
-            )
+            route = models.Route(user_id=current_user.id)
 
+            route.name = form.name.data
+            route.start = form.start.data
+            route.final = form.final.data
+            route.time = form.time.data
+
+            days = form.days.data
+
+            for day in days:
+                if day == 0:
+                    route.mon = True
+                elif day == 1:
+                    route.tue = True
+                elif day == 2:
+                    route.wed = True
+                elif day == 3:
+                    route.thu = True
+                elif day == 4:
+                    route.fri = True
+                elif day == 5:
+                    route.sat = True
+                elif day == 6:
+                    route.sun = True
+
+            # Add the route to the database
             db.session.add(route)
             db.session.commit()
 
-            flash(f'{route.name} was successfully added!', 'success')
+            # Flash a confirmation message to the user
+            flash('The route was successfully added!', 'success')
+
+            # Redirect to the dashboard
             return redirect(url_for('dashboard'))
 
+        # If the user has too many routes
         else:
             flash('Please delete a route before trying to add another.', 'danger')
 
-    # If the submitted form has error(s)
-    if form.errors:
-        print('\nError(s) detected in submitted form:\n', file=sys.stderr)
-        for fieldName, errorMessages in form.errors.items():
-            for err in errorMessages:
-                print(f'* {err}\n', file=sys.stderr)
-
+    # Return the route page
     return render_template('route/route.html', user=current_user, form=form)
 
 @app.route('/route/update/<int:id>', methods=['GET', 'POST'])
 @login_required
 def update_route(id):
 
-    # Get the route to be edited from the database
-    route = Route.query.get(int(id))
+    # Get the target route from the database
+    route = models.Route.query.get(int(id))
 
-    # Create a form with the pre-existing values already populated
-    form = RouteForm(name=route.name, start=route.start, final=route.final, time=route.time)
+    # Create a RouteForm with the pre-existing values already populated
+    form = forms.RouteForm(name=route.name, start=route.start, final=route.final, time=route.time)
 
-    # Choices for the location selector fields
-    form.start.choices = [(c.id, c.name) for c in Location.query.filter_by(user_id=current_user.id)]
-    form.final.choices = [(c.id, c.name) for c in Location.query.filter_by(user_id=current_user.id)]
+    # Get the user's locations
+    locations = models.Location.query.filter_by(user_id=current_user.id)
 
-    # If the user is submitting a valid form
+    form.start.choices = [(x.id, x.name) for x in locations]
+    form.final.choices = [(x.id, x.name) for x in locations]
+
+    # If a valid RouteForm was submitted
     if form.validate_on_submit():
-
-        # Combine the collected time with today's date
-        today = datetime.date.today()
-        time = datetime.datetime.combine(today, form.time.data)
 
         # Update the route in the database
         route.name = form.name.data
         route.start = form.start.data
         route.final = form.final.data
-        route.time = time
+        route.time = form.time.data
 
-        # Save the changes
+        # Save the changes to the database
         db.session.commit()
 
-        flash('The route was successfully updated!', 'success')
+        # Flash a confirmation message to the user
+        flash('The route was successfully added!', 'success')
+
+        # Redirect to the dashboard
         return redirect(url_for('dashboard'))
 
-    # If the submitted form has error(s)
-    if form.errors:
-        print('\nError(s) detected in submitted form:\n', file=sys.stderr)
-        for fieldName, errorMessages in form.errors.items():
-            for err in errorMessages:
-                print(f'* {err}\n', file=sys.stderr)
-
+    # Return the route page
     return render_template('route/route.html', user=current_user, form=form)
 
 @app.route('/route/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_route(id):
 
-    form = SubmitForm()
+    # Get a SubmitForm from forms.py
+    form = forms.SubmitForm()
 
-    # If the user is submitting a valid form
+    # If a valid SubmitForm was submitted
     if form.validate_on_submit():
 
+        # This will hold the route to be deleted
         toDelete = None
 
-        # Get all of the routes for this user
-        routes = Route.query.filter_by(user_id=current_user.id).all()
+        # Get the user's routes
+        routes = models.Route.query.filter_by(user_id=current_user.id)
 
-        # Make sure the route is one of the user's own
+        # Find the route to be deleted from the user's routes
         for route in routes:
             if route.id == id:
                 toDelete = route
                 break
 
-        # Delete the route, if one was found
+        # If a matching route was found
         if toDelete:
+
+            # Delete the route from the database
             db.session.delete(route)
             db.session.commit()
+
+            # Flash a confirmation message to the user
             flash('The route was deleted.', 'success')
 
+        # If no matching route was found
         else:
+
+            # Flash an error message to the user
             flash('You do not have any routes with that ID.', 'danger')
 
-    # If the submitted form has error(s)
-    if form.errors:
-        print('\nError(s) detected in submitted form:\n', file=sys.stderr)
-        for fieldName, errorMessages in form.errors.items():
-            for err in errorMessages:
-                print(f'* {err}\n', file=sys.stderr)
-
+    # Redirect to the dashboard
     return redirect(url_for('dashboard'))

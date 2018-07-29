@@ -3,12 +3,13 @@ from . import db
 
 from flask_login import UserMixin
 
+from passlib.hash import argon2
+
 from sqlalchemy import Boolean, Column, DateTime, DECIMAL, ForeignKey, Integer, String
+from sqlalchemy.dialects.mysql import TIME
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-
-from passlib.hash import argon2
 
 import datetime
 
@@ -61,7 +62,7 @@ class Location(db.Model):
     lat = Column(DECIMAL(precision=10, scale=6), nullable=False)
     lng = Column(DECIMAL(precision=10, scale=6), nullable=False)
 
-    weather = relationship('Weather', backref='location', lazy=True, uselist=False)
+    forecast = relationship('Forecast', backref='location', lazy=True, uselist=False)
 
 class Route(db.Model):
 
@@ -76,28 +77,43 @@ class Route(db.Model):
     start = Column(Integer, ForeignKey('location.id'), nullable=False)
     final = Column(Integer, ForeignKey('location.id'), nullable=False)
 
-    time = Column(DateTime(timezone=True), nullable=False)
+    time = Column(TIME(), nullable=False)
 
-class Weather(db.Model):
+    mon = Column(Boolean, nullable=False, default=False)
+    tue = Column(Boolean, nullable=False, default=False)
+    wed = Column(Boolean, nullable=False, default=False)
+    thu = Column(Boolean, nullable=False, default=False)
+    fri = Column(Boolean, nullable=False, default=False)
+    sat = Column(Boolean, nullable=False, default=False)
+    sun = Column(Boolean, nullable=False, default=False)
 
-    __tablename__ = 'weather'
+class Forecast(db.Model):
 
-    def update(self):
-        self.updated = datetime.datetime.now()
-        db.session.add(self)
-        db.session.commit()
+    __tablename__ = 'forecast'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
     location_id = Column(Integer, ForeignKey('location.id'), nullable=False)
 
-    day_0 = Column(String(32))
-    day_1 = Column(String(32))
-    day_2 = Column(String(32))
-    day_3 = Column(String(32))
-    day_4 = Column(String(32))
-    day_5 = Column(String(32))
-    day_6 = Column(String(32))
-    day_7 = Column(String(32))
+    day_0_weather = Column(String(32))
+    day_0_summary = Column(String(255))
 
-    updated = Column(DateTime(timezone=True))
+    day_1_weather = Column(String(32))
+    day_1_summary = Column(String(255))
+
+    day_2_weather = Column(String(32))
+    day_2_summary = Column(String(255))
+
+    day_3_weather = Column(String(32))
+    day_3_summary = Column(String(255))
+
+    day_4_weather = Column(String(32))
+    day_4_summary = Column(String(255))
+
+    day_5_weather = Column(String(32))
+    day_5_summary = Column(String(255))
+
+    day_6_weather = Column(String(32))
+    day_6_summary = Column(String(255))
+
+    updated = Column(DateTime(timezone=True), nullable=False, server_default=func.now())

@@ -1,8 +1,5 @@
 
-from .. import app
-
-from ..forms import *
-from ..models import *
+from .. import app, forms, models
 
 from flask import render_template
 from flask_login import current_user, login_required
@@ -21,58 +18,33 @@ def about():
 @login_required
 def dashboard():
 
-    # Form for deleting locations and routes
-    form = SubmitForm()
+    # Get an instance of the SubmitForm from forms.py
+    form = forms.SubmitForm()
 
-    # Locations for this user
-    locations = Location.query.filter_by(user_id=current_user.id)
-    location_ids = [l.id for l in locations]
+    # Get this user's locations
+    locations = models.Location.query.filter_by(user_id=current_user.id)
+    location_ids = [x.id for x in locations]
 
-    # Routes for this user
-    routes = Route.query.filter_by(user_id=current_user.id)
+    # Get this user's routes
+    routes = models.Route.query.filter_by(user_id=current_user.id)
 
-    # Weather for this user
-    forecasts = Weather.query.filter( Weather.location_id.in_( location_ids )).all()
+    # Get this user's forecasts
+    forecasts = models.Forecast.query.filter(models.Forecast.location_id.in_(location_ids)).all()
 
+    # Return the dashboard page
     return render_template('dashboard.html', user=current_user, form=form, locations=locations, routes=routes, forecasts=forecasts)
 
 @app.route('/users')
 @login_required
 def show_all_users():
-    users = User.query.order_by(User.id).all()
+
+    # Get all of the users from the database
+    users = models.User.query.order_by(models.User.id).all()
+
+    # Return the users page
     return render_template('users.html', user=current_user, users=users)
 
-@app.route('/post', methods=['POST'])
-def post_test():
-
-    form = RouteForm()
-
-    form.start.choices = [(c.id, c.name) for c in Location.query.filter_by(user_id=current_user.id)]
-    form.final.choices = [(c.id, c.name) for c in Location.query.filter_by(user_id=current_user.id)]
-
-    # If the user is submitting a valid form
-    if form.validate_on_submit():
-
-        # Combine the collected time with today's date
-        today = datetime.date.today()
-        time = datetime.datetime.combine(today, form.time.data)
-
-        resp = ''
-
-        for day in form.days.data:
-            resp += str(day) + ' ... '
-
-        return resp
-
-    # If the submitted form has error(s)
-    if form.errors:
-        print('\nError(s) detected in submitted form:\n', file=sys.stderr)
-        for fieldName, errorMessages in form.errors.items():
-            for err in errorMessages:
-                print(f'* {err}\n', file=sys.stderr)
-
-    return render_template('route/route.html', user=current_user, form=form)
-
+# Import the other views from this package
 from . import auth
 from . import location
 from . import route

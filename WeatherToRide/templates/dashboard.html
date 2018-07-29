@@ -32,7 +32,7 @@
                 <br>
 
                 <p class="lead">
-                    <i class="wi {{ location.weather.day_0 }}"></i>
+                    <i class="wi {{ location.forecast.day_0 }}"></i>
                 </p>
 
                 <br>
@@ -59,7 +59,7 @@
                 {{ form.csrf_token }}
                 <h1>{{ route.name }}</h1><br>
                 <p class="lead">
-                    ( {{ route.start }} -> {{ route.final }} ) @ {{ route.time.time() }}
+                    {{ route.time }}
                 </p><br>
                 <div class="btn-group">
                     <a href="{{ url_for('update_route', id=route.id) }}" 
