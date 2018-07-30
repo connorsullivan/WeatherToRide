@@ -89,8 +89,8 @@ class RouteForm(FlaskForm):
         render_kw = {'placeholder': 'Work commute'} 
     )
 
-    start = SelectField('Start destination', coerce=int, validators=[DataRequired()])
-    final = SelectField('Final destination', coerce=int, validators=[DataRequired()])
+    location_1 = SelectField('Start destination', coerce=int, validators=[DataRequired()])
+    location_2 = SelectField('Final destination', coerce=int, validators=[DataRequired()])
 
     time = TimeField('Departure time')
 

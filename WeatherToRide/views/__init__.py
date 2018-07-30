@@ -1,10 +1,8 @@
 
 from .. import app, forms, models
 
-from flask import render_template, jsonify
+from flask import render_template
 from flask_login import current_user, login_required
-
-import sys
 
 @app.route('/')
 def index():
@@ -43,6 +41,33 @@ def show_all_users():
 
     # Return the users page
     return render_template('users.html', user=current_user, users=users)
+
+@app.route('/routeFormTest', methods=['POST'])
+@login_required
+def route_form_test():
+
+    form = forms.RouteForm()
+
+    locations = models.Location.query.filter_by(user_id=current_user.id)
+
+    form.location_1.choices = [(x.id, x.name) for x in locations]
+    form.location_2.choices = [(x.id, x.name) for x in locations]
+
+    if form.validate_on_submit():
+
+        user_id = current_user.id
+        name = form.name.data
+        location_1_id = form.location_1.data
+        location_2_id = form.location_2.data
+        time = form.time.data
+        days = form.days.data
+
+        response = ''
+
+        for day in days:
+            response += str(day) + ' ... '
+
+        return(response)
 
 # Import the other views from this package
 from . import auth

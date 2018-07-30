@@ -34,7 +34,7 @@ def get_coordinates(address):
             lat, lng = [c.strip() for c in coords.split(',')]
             return lat, lng
         except:
-            pass
+            return None, None
 
     # The query string payload for the API request
     payload = {

@@ -74,8 +74,8 @@ class Route(db.Model):
 
     name = Column(String(32), nullable=False)
 
-    start = Column(Integer, ForeignKey('location.id'), nullable=False)
-    final = Column(Integer, ForeignKey('location.id'), nullable=False)
+    location_1 = Column(Integer, ForeignKey('location.id'), nullable=False)
+    location_2 = Column(Integer, ForeignKey('location.id'), nullable=False)
 
     time = Column(TIME(), nullable=False)
 

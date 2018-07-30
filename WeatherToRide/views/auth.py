@@ -60,15 +60,6 @@ def login():
             # Flash a message to the user
             flash('That e-mail address is not registered with an account.', 'danger')
 
-    # If the submitted form has error(s)
-    if form.errors:
-
-        # Print the errors to the console
-        print('\nError(s) detected in submitted form:\n', file=sys.stderr)
-        for fieldName, errorMessages in form.errors.items():
-            for err in errorMessages:
-                print(f'* {err}\n', file=sys.stderr)
-
     # Send the login page to the user
     return render_template('auth/login.html', user=current_user, form=form)
 
@@ -128,15 +119,6 @@ def register():
 
         # Redirect to the login page
         return redirect(url_for('login'))
-
-    # If the submitted form has error(s)
-    if form.errors:
-
-        # Print the errors to the console
-        print('\nError(s) detected in submitted form:\n', file=sys.stderr)
-        for fieldName, errorMessages in form.errors.items():
-            for err in errorMessages:
-                print(f'* {err}\n', file=sys.stderr)
 
     # Send the register page to the user
     return render_template('auth/register.html', user=current_user, form=form)
