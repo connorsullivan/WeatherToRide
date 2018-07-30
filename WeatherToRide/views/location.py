@@ -6,8 +6,6 @@ from ..utils import geocode, weather
 from flask import abort, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
-import sys
-
 # Limit how many locations a user can have at one time
 MAX_LOCATIONS = 5
 
@@ -49,7 +47,7 @@ def create_or_update_location(user_id, name, address, location_id=None):
         return None, 'User does not exist.'
 
     # Validate the location name
-    max_length_name = models.User.name.property.columns[0].type.length
+    max_length_name = models.Location.name.property.columns[0].type.length
 
     if not name:
         return None, 'Location name cannot be blank.'

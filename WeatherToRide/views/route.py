@@ -1,12 +1,120 @@
 
 from .. import app, db, forms, models
 
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
-import sys
-
+# Limit how many routes a user can have at one time
 MAX_ROUTES = 3
+
+def create_or_update_route(user_id, name, start, final, time, days, route_id=None):
+
+    # Validate the user
+    if not user_id:
+        return None, 'User ID cannot be blank.'
+    if type(user_id) is not int:
+        return None, 'User ID must be an integer.'
+
+    # Find the user in the database
+    user = None
+
+    try:
+        user = models.User.query.get(int(user_id))
+    except:
+        return None, 'Error while trying to find user.'
+
+    if not user:
+        return None, 'User does not exist.'
+
+    # Validate the route name
+    max_length_name = models.Route.name.property.columns[0].type.length
+
+    if not name:
+        return None, 'Route name cannot be blank.'
+    if type(name) is not str:
+        return None, 'Route name must be a string.'
+    if len(name) > max_length_name:
+        return None, f'Route name cannot be longer than {max_length_name} characters.'
+
+    # Validate the route starting location
+    if not start:
+        return None, 'Starting location ID is required.'
+    if type(start) is not int:
+        return None, 'Starting location ID must be an integer.'
+
+    start_location = None
+
+    try:
+        start_location = models.Location.query.get(int(start))
+    except:
+        return None, 'Error while trying to find starting location.'
+
+    if not start_location:
+        return None, 'Starting location does not exist.'
+
+    if start_location.user_id != user.id:
+        return None, 'Starting location does not belong to user.'
+
+    # Validate the route ending location
+    if not final:
+        return None, 'Ending location ID is required.'
+    if type(final) is not int:
+        return None, 'Ending location ID must be an integer.'
+
+    final_location = None
+
+    try:
+        final_location = models.Location.query.get(int(final))
+    except:
+        return None, 'Error while trying to find ending location.'
+
+    if not final_location:
+        return None, 'Ending location does not exist.'
+
+    if final_location.user_id != user.id:
+        return None, 'Ending location does not belong to user.'
+
+    # Create a new location
+    location = models.Location(user_id=int(user.id))
+
+    # Validate the location (if one already exists)
+    if location_id:
+        if type(location_id) is not int:
+            return None, 'Location ID must be an integer.'
+
+        location = None
+
+        location = models.Location.query.get(int(location_id))
+
+        if not location:
+            return None, 'Location does not exist.'
+
+        if location.user_id != user.id:
+            return None, 'Location does not belong to user.'
+
+    # Check that the user doesn't have too many locations
+    else:
+        if len(user.locations) >= MAX_LOCATIONS:
+            return None, 'Location limit has been reached.'
+
+    # Get the coordinates from the address
+    lat, lng = geocode.get_coordinates(str(address))
+
+    if not lat or not lng:
+        return None, 'Address could not be located.'
+
+    # Add the information to the route
+    route.name = name
+    route.start = start
+    route.final = final
+    route.time = time
+    route.days = days
+
+    # Add the route to the database
+    db.session.add(route)
+    db.session.commit()
+
+    return route, None
 
 @app.route('/route/create', methods=['GET', 'POST'])
 @login_required
