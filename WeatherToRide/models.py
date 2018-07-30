@@ -116,4 +116,7 @@ class Forecast(db.Model):
     day_6_weather = Column(String(32))
     day_6_summary = Column(String(255))
 
-    updated = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    day_7_weather = Column(String(32))
+    day_7_summary = Column(String(255))
+
+    updated = Column(DateTime(timezone=True), nullable=False)

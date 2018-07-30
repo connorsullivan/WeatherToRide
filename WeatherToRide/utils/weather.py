@@ -1,9 +1,10 @@
 
 from .. import app, db, models
 
-import requests as req
+import datetime
+import requests
 
-def get_forecast(lat, lng):
+def get_forecast_from_api(lat, lng):
 
     """
 
@@ -14,57 +15,48 @@ def get_forecast(lat, lng):
         lng: Longitude for the location (required)
 
     Returns:
-        A list of dicts [{}, {}, {}]
+        response, error
 
-        Each dictionary represents the forecast for a day of the week, 
-            starting with the current day and moving into the future.
-
-        list[0] is for the current day, list[1] is for tomorrow, etc.
-
-        The structure of each dictionary is as follows:
-
-            { 
-                'weather': The 'icon' property returned from Dark Sky, 
-                'summary': The 'summary' property returned from Dark Sky 
-            }
-
-        None if an error was encountered
+        response: The JSON response from the API request (None if error)
+        error: First error that was encountered while processing the request (None if success)
 
     """
 
     # This API key should be kept secret
     key = app.config['DARKSKY_KEY']
 
-    # The URL to query the Dark Sky API
+    # The query URL
     url = f'https://api.darksky.net/forecast/{key}/{lat},{lng}'
 
-    # Try to get a forecast for the coordinates from Dark Sky
+    # Request a forecast from the Dark Sky API
+    response = None
     try:
-        response = req.get(url).json()['daily']['data']
-
-    # If there was a problem with the request
+        response = requests.get(url).json()
     except:
-        return None
+        return None, 'Error while querying API.'
 
-    # If the data was not fully received
-    if len(response) < 8:
-        return None
+    if not response:
+        return None, 'Received empty response from API.'
 
-    # Assemble the information into a list of dicts
-    forecast = []
-    for day in response:
-        forecast.append({
-            'weather': day['icon'], 
-            'summary': day['summary']
-        })
-
-    # Return the forecast
-    return forecast
+    return response, None
 
 def update_forecast(location):
 
     # Get the forecast for this location
-    response = get_forecast(location.lat, location.lng)
+    response, error = get_forecast_from_api(location.lat, location.lng)
+
+    # If there was a problem fetching the forecast
+    if error:
+        return None, error
+
+    # Extract the daily forecasts from the response
+    try:
+        response = response['daily']['data']
+    except:
+        return None, 'Error while extracting daily forecasts from response.'
+
+    if len(response) < 8:
+        return None, f'Daily forecasts list is smaller than expected ({len(daily)} instead of 8).'
 
     # Get this location's forecast entry from the database
     forecast = models.Forecast.query.filter_by(location_id=location.id).first()
@@ -74,27 +66,39 @@ def update_forecast(location):
         forecast = models.Forecast(location_id=location.id)
 
     # Add the new information to the forecast
-    forecast.day_0_weather = response[0]['weather']
-    forecast.day_0_summary = response[0]['summary']
+    try:
 
-    forecast.day_1_weather = response[1]['weather']
-    forecast.day_1_summary = response[1]['summary']
+        forecast.day_0_weather = response[0]['icon']
+        forecast.day_0_summary = response[0]['summary']
 
-    forecast.day_2_weather = response[2]['weather']
-    forecast.day_2_summary = response[2]['summary']
+        forecast.day_1_weather = response[1]['icon']
+        forecast.day_1_summary = response[1]['summary']
 
-    forecast.day_3_weather = response[3]['weather']
-    forecast.day_3_summary = response[3]['summary']
+        forecast.day_2_weather = response[2]['icon']
+        forecast.day_2_summary = response[2]['summary']
 
-    forecast.day_4_weather = response[4]['weather']
-    forecast.day_4_summary = response[4]['summary']
+        forecast.day_3_weather = response[3]['icon']
+        forecast.day_3_summary = response[3]['summary']
 
-    forecast.day_5_weather = response[5]['weather']
-    forecast.day_5_summary = response[5]['summary']
+        forecast.day_4_weather = response[4]['icon']
+        forecast.day_4_summary = response[4]['summary']
 
-    forecast.day_6_weather = response[6]['weather']
-    forecast.day_6_summary = response[6]['summary']
+        forecast.day_5_weather = response[5]['icon']
+        forecast.day_5_summary = response[5]['summary']
+
+        forecast.day_6_weather = response[6]['icon']
+        forecast.day_6_summary = response[6]['summary']
+
+        forecast.day_7_weather = response[7]['icon']
+        forecast.day_7_summary = response[7]['summary']
+
+    except:
+        return None, 'Error while extracting daily forecasts to the model.'
+
+    forecast.updated = datetime.datetime.now()
 
     # Add the forecast to the database
     db.session.add(forecast)
     db.session.commit()
+
+    return forecast, None
