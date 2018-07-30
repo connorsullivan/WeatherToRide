@@ -10,9 +10,9 @@
     <div class="jumbotron text-center">
         <h1>Hi, {{ user.name }}.</h1><br><br>
         <div class="btn-group">
-            <a href="{{ url_for('create_location') }}" 
+            <a href="{{ url_for('create_location_view') }}" 
                 class="btn btn-success btn-lg" role="button">+ Location</a>
-            <a href="{{ url_for('create_route') }}" 
+            <a href="{{ url_for('create_route_view') }}" 
                 class="btn btn-primary btn-lg" role="button">+ Route</a>
         </div>
     </div>
@@ -23,7 +23,7 @@
 
         <div class="jumbotron text-center">
 
-            <form action="{{ url_for('delete_location', id=location.id) }}" method="POST">
+            <form action="{{ url_for('delete_location_view', id=location.id) }}" method="POST">
 
                 {{ form.csrf_token }}
 
@@ -39,7 +39,7 @@
 
                 <div class="btn-group">
 
-                    <a href="{{ url_for('update_location', id=location.id) }}" 
+                    <a href="{{ url_for('update_location_view', id=location.id) }}" 
                         class="btn btn-primary" role="button">Update</a>
 
                     {{ form.submit(class_="btn btn-danger", value="Remove") }}
@@ -55,14 +55,14 @@
     {% for route in routes %}
 
         <div class="jumbotron text-center">
-            <form action="{{ url_for('delete_route', id=route.id) }}" method="POST">
+            <form action="{{ url_for('delete_route_view', id=route.id) }}" method="POST">
                 {{ form.csrf_token }}
                 <h1>{{ route.name }}</h1><br>
                 <p class="lead">
                     {{ route.time }}
                 </p><br>
                 <div class="btn-group">
-                    <a href="{{ url_for('update_route', id=route.id) }}" 
+                    <a href="{{ url_for('update_route_view', id=route.id) }}" 
                         class="btn btn-primary" role="button">Update</a>
                     {{ form.submit(class_="btn btn-danger", value="Remove") }}
                 </div>

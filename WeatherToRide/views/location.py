@@ -6,6 +6,8 @@ from ..utils import geocode, weather
 from flask import abort, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
+from sqlalchemy import or_
+
 # Limit how many locations a user can have at one time
 MAX_LOCATIONS = 5
 
@@ -151,7 +153,8 @@ def delete_location(user_id, location_id):
 
     # Delete any routes using the location
     routes = models.Route.query.filter_by(user_id=user.id)
-    routes.filter((models.Route.start == location.id) | (models.Route.final == location.id))
+    routes = routes.filter(or_(models.Route.location_1 == location.id, models.Route.location_2 == location.id))
+
     if routes:
         for route in routes:
             db.session.delete(route)
@@ -172,7 +175,7 @@ def delete_location(user_id, location_id):
 
 @app.route('/location/create', methods=['GET', 'POST'])
 @login_required
-def create_location():
+def create_location_view():
 
     form = forms.LocationForm()
 
@@ -195,7 +198,7 @@ def create_location():
 
 @app.route('/location/update/<int:id>', methods=['GET', 'POST'])
 @login_required
-def update_location(id):
+def update_location_view(id):
 
     # Try to get the location from the database
     location = models.Location.query.get(int(id))
@@ -229,7 +232,7 @@ def update_location(id):
 
 @app.route('/location/delete/<int:id>', methods=['POST'])
 @login_required
-def delete_location(id):
+def delete_location_view(id):
 
     form = forms.SubmitForm()
 

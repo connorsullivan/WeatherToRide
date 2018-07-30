@@ -187,7 +187,7 @@ def delete_route(user_id, route_id):
 
 @app.route('/route/create', methods=['GET', 'POST'])
 @login_required
-def create_route():
+def create_route_view():
 
     if len(current_user.locations) < 2:
         flash('You must have at least 2 saved locations before creating a route.', 'danger')
@@ -221,7 +221,7 @@ def create_route():
 
 @app.route('/route/update/<int:id>', methods=['GET', 'POST'])
 @login_required
-def update_route(id):
+def update_route_view(id):
 
     route = models.Route.query.get(int(id))
 
@@ -280,7 +280,7 @@ def update_route(id):
 
 @app.route('/route/delete/<int:id>', methods=['POST'])
 @login_required
-def delete_route(id):
+def delete_route_view(id):
 
     form = forms.SubmitForm()
 
