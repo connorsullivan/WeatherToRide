@@ -3,31 +3,13 @@ from .. import app, db, forms, models
 
 from ..utils import geocode, weather
 
-from flask import abort, flash, redirect, render_template, url_for
+from flask import abort, flash, jsonify, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
 from sqlalchemy import or_
 
 # Limit how many locations a user can have at one time
 MAX_LOCATIONS = 5
-
-'''
-    Mapping Dark Sky forecasts to CSS icons
-
-    CSS source: http://erikflowers.github.io/weather-icons/
-'''
-css_icon_map = { 
-    'clear-day': 'wi-day-sunny', 
-    'clear-night': 'wi-night-clear', 
-    'rain': 'wi-rain', 
-    'snow': 'wi-snow', 
-    'sleet': 'wi-sleet', 
-    'wind': 'wi-windy', 
-    'fog': 'wi-fog', 
-    'cloudy': 'wi-cloud', 
-    'partly-cloudy-day': 'wi-day-cloudy', 
-    'partly-cloudy-night': 'wi-night-partly-cloudy' 
-}
 
 def create_or_update_location(user_id, name, address, location_id=None):
 
@@ -252,3 +234,11 @@ def delete_location_view(id):
 
     # Redirect to the dashboard
     return redirect(url_for('dashboard'))
+
+@app.route('/api/1.0/location/read')
+@login_required
+def get_locations_api():
+
+    locations = current_user.locations
+
+    return jsonify(len(locations))
