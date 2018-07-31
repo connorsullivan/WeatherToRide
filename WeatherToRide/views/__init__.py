@@ -4,24 +4,6 @@ from .. import app, forms, models
 from flask import render_template
 from flask_login import current_user, login_required
 
-'''
-    Mapping Dark Sky forecasts to CSS icons
-
-    CSS source: http://erikflowers.github.io/weather-icons/
-'''
-css_icon_map = { 
-    'clear-day': 'wi-day-sunny', 
-    'clear-night': 'wi-night-clear', 
-    'rain': 'wi-rain', 
-    'snow': 'wi-snow', 
-    'sleet': 'wi-sleet', 
-    'wind': 'wi-windy', 
-    'fog': 'wi-fog', 
-    'cloudy': 'wi-cloud', 
-    'partly-cloudy-day': 'wi-day-cloudy', 
-    'partly-cloudy-night': 'wi-night-partly-cloudy' 
-}
-
 @app.route('/')
 def index():
     return render_template('index.html', user=current_user)

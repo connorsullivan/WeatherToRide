@@ -33,7 +33,10 @@
 
                 <p class="lead">
                     <h2>{{ location.forecast.day_0_weather }}</h2>
-                    {{ location.forecast.day_0_summary }}
+                    <i class="wi {{ location.forecast.day_0_icon }}"></i>
+                    <p class="lead">
+                        {{ location.forecast.day_0_summary }}
+                    </p>
                 </p>
 
                 <br>
