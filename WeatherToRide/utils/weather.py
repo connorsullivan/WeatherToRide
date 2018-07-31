@@ -40,22 +40,25 @@ def get_forecast_from_api(lat, lng):
 
     """
 
-    # This API key should be kept secret
-    key = app.config['DARKSKY_KEY']
-
-    # The query URL
-    url = f'https://api.darksky.net/forecast/{key}/{lat},{lng}'
-
-    # Request a forecast from the Dark Sky API
-    response = None
     try:
-        response = requests.get(url).json()
+        key = app.config['DARKSKY_KEY']
     except:
-        return None, 'Error while querying API.'
+        return None, 'The Dark Sky API is not configured. Weather services are unavailable.'
 
-    if not response:
-        return None, 'Received empty response from API.'
+    # Try to query the Dark Sky API
+    try:
 
+        url = f'https://api.darksky.net/forecast/{key}/{lat},{lng}'
+
+        response = requests.get(url).json()
+
+        if not response:
+            return None, 'The API returned an empty response.'
+
+    except:
+        return None, 'There was a problem while trying to get the weather for this location.'
+
+    # Return the response
     return response, None
 
 def update_forecast(location):
@@ -71,10 +74,10 @@ def update_forecast(location):
     try:
         response = response['daily']['data']
     except:
-        return None, 'Error while extracting daily forecasts from response.'
+        return None, 'There was a problem while trying to get the daily forecast for this location.'
 
     if len(response) < 8:
-        return None, f'Daily forecasts list is smaller than expected ({len(daily)} instead of 8).'
+        return None, f'The daily forecast list received is smaller than expected ({len(daily)} instead of 8).'
 
     # Get this location's forecast entry from the database
     forecast = models.Forecast.query.filter_by(location_id=location.id).first()
@@ -119,12 +122,14 @@ def update_forecast(location):
         forecast.day_7_icon = css_icon_map[response[7]['icon']]
 
     except:
-        return None, 'Error while extracting daily forecasts to the model.'
+        return None, 'There was a problem extracting forecast data to the database.'
 
+    # Set the update time on the forecast
     forecast.updated = datetime.datetime.now()
 
     # Add the forecast to the database
     db.session.add(forecast)
     db.session.commit()
 
+    # Return the forecast
     return forecast, None

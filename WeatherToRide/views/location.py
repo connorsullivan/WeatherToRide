@@ -29,7 +29,7 @@ def create_or_update_location(user_id, name, address, location_id=None):
         return f'Location name cannot be longer than {max_length_name} characters.'
 
     # Validate the location address
-    max_length_address = models.Location.address.property.columns[0].type.length
+    max_length_address = 255
 
     if not address:
         return 'Location address cannot be blank.'
@@ -53,11 +53,11 @@ def create_or_update_location(user_id, name, address, location_id=None):
             return None, 'Location limit has been reached.'
 
     # Get the coordinates from the address
-    lat, lng = geocode.get_coordinates(str(address))
+    lat, lng, error = geocode.get_coordinates(str(address))
 
     # If the address could not be found
-    if not lat or not lng:
-        return None, 'Address could not be located.'
+    if error:
+        return None, error
 
     # Save the new information to this location
     location.name = name

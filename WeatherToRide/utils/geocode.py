@@ -21,47 +21,52 @@ def get_coordinates(address):
                 '1720 2nd Ave S, Birmingham, AL 35294'
 
     Returns:
-        lat, lng - The coordinate pair for the requested address
+        lat, lng, error - The coordinates for the address, plus any error that was caught
 
-        None, None - If there is an error in processing the request
+        (If there is an error, the values of lat and lng will be None.)
 
     """
 
     # If the address is already resolved, just return the coordinates
     if address.startswith('<<<') and address.endswith('>>>'):
         coords = address.strip('<>')
+
         try:
-            lat, lng = [c.strip() for c in coords.split(',')]
-            return lat, lng
+            lat, lng = [float(c.strip()) for c in coords.split(',')]
+            
+            if lat < -90 or lat > 90:
+                return None, None, 'Latitude is outside of allowable range.'
+            if lng < -180 or lng > 180:
+                return None, None, 'Longitude is outside of allowable range.'
+
+            return lat, lng, None
+
         except:
-            return None, None
+            return None, None, 'There is a problem with the given coordinates.'
 
-    # The query string payload for the API request
-    payload = {
-        'address' : address, 
-        'key' : app.config['GOOGLE_KEY']
-    }
+    # The payload for the API request
+    payload = {'address' : address}
 
-    # The URL to query the Google Geocoding API
-    url = f'https://maps.googleapis.com/maps/api/geocode/json?{urlencode(payload)}'
+    # Check for the API key
+    try:
+        payload['key'] = app.config['GOOGLE_KEY']
+    except:
+        return None, None, 'The Google Geocoding API is not configured. Location services are unavailable.'
 
+    # Try to query the Google Geocoding API
     try:
 
-        # Extract the JSON response from the API
+        url = f'https://maps.googleapis.com/maps/api/geocode/json?{urlencode(payload)}'
+
+        # Extract the JSON response
         response = req.get(url).json()
 
-        # Extract the coordinates from the JSON response
-        if response:
-            lat = response['results'][0]['geometry']['location']['lat']
-            lng = response['results'][0]['geometry']['location']['lng']
+        # Parse the response for the coordinates
+        lat = response['results'][0]['geometry']['location']['lat']
+        lng = response['results'][0]['geometry']['location']['lng']
 
-            # Return the coordinates
-            return lat, lng
+        # Return the coordinates
+        return lat, lng, None
 
-        # If there was a problem extracting the coordinates
-        else:
-            return None, None
-
-    # If there was a problem with the API request
     except:
-        return None, None
+        return None, None, 'There was a problem while trying to find this address.'
