@@ -1,6 +1,8 @@
 
 from .. import app, db, forms, models
 
+from ..utils import validator
+
 from flask import abort, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
@@ -10,74 +12,49 @@ MAX_ROUTES = 5
 
 def create_or_update_route(user_id, name, location_1_id, location_2_id, time, days, route_id=None):
 
-    if not user_id:
-        return None, 'User ID cannot be blank.'
-    if type(user_id) is not int:
-        return None, 'User ID must be an integer.'
+    # Validate the user
+    user, error = validator.validate_user(user_id)
+    if error:
+        return None, error
 
-    user = None
-
-    try:
-        user = models.User.query.get(int(user_id))
-    except:
-        return None, 'Error while trying to find user.'
-
-    if not user:
-        return None, 'User does not exist.'
-
-    max_length_name = models.Route.name.property.columns[0].type.length
-
+    # Validate the route name
     if not name:
         return None, 'Route name cannot be blank.'
     if type(name) is not str:
         return None, 'Route name must be a string.'
+
+    max_length_name = models.Route.name.property.columns[0].type.length
+
     if len(name) > max_length_name:
         return None, f'Route name cannot be longer than {max_length_name} characters.'
 
-    if not location_1_id:
-        return None, 'First location ID is required.'
-    if type(location_1_id) is not int:
-        return None, 'First location ID must be an integer.'
+    # Validate the first location
+    location_1, error = validator.validate_location(location_1_id)
+    if error:
+        return None, error
 
-    location_1 = None
+    if location_1.user != user:
+        return None, 'Starting location does not belong to user.'
 
-    try:
-        location_1 = models.Location.query.get(int(location_1_id))
-    except:
-        return None, 'Error while trying to find first location.'
+    # Validate the second location
+    location_2, error = validator.validate_location(location_2_id)
+    if error:
+        return None, error
 
-    if not location_1:
-        return None, 'First location does not exist.'
+    if location_2.user != user:
+        return None, 'Ending location does not belong to user.'
 
-    if location_1.user_id != user.id:
-        return None, 'First location does not belong to user.'
-
-    if not location_2_id:
-        return None, 'Second location ID is required.'
-    if type(location_2_id) is not int:
-        return None, 'Second location ID must be an integer.'
-
-    location_2 = None
-
-    try:
-        location_2 = models.Location.query.get(int(location_2_id))
-    except:
-        return None, 'Error while trying to find second location.'
-
-    if not location_2:
-        return None, 'Second location does not exist.'
-
-    if location_2.user_id != user.id:
-        return None, 'Second location does not belong to user.'
-
+    # Make sure the two locations are different
     if location_1 == location_2:
-        return None, 'First and second locations must be different.'
+        return None, 'Starting and ending locations must be different.'
 
+    # Validate the time
     if not time:
         return None, 'Time is required.'
     if type(time) is not datetime.time:
         return None, 'Time must be of type datetime.time'
 
+    # Validate the days
     if not days:
         return None, 'Days are required.'
     if type(days) is not list:
@@ -89,26 +66,21 @@ def create_or_update_route(user_id, name, location_1_id, location_2_id, time, da
         if int(day) < 0 or int(day) > 6:
             return None, 'Days in list must be integers between 0 and 6 (inclusive).'
 
+    # Create a new route
     route = models.Route(user_id=int(user.id))
 
+    # Validate the current route (if updating instead of creating)
     if route_id:
-        if type(route_id) is not int:
-            return None, 'Route ID must be an integer.'
+        route, error = validator.validate_route(route_id)
+        if error:
+            return None, error
 
-        route = None
-
-        route = models.Route.query.get(int(route_id))
-
-        if not route:
-            return None, 'Route does not exist.'
-
-        if route.user_id != user.id:
-            return None, 'Route does not belong to user.'
-
+    # Check that the user doesn't have too many routes
     else:
         if len(user.routes) >= MAX_ROUTES:
             return None, 'Route limit has been reached.'
 
+    # Save the new information to this route
     route.name = name
 
     route.location_1 = location_1.id
@@ -140,49 +112,34 @@ def create_or_update_route(user_id, name, location_1_id, location_2_id, time, da
         if day == 6:
             route.sun = True
 
+    # Save the route to the database
     db.session.add(route)
     db.session.commit()
 
+    # Return the newly created/updated route
     return route, None
 
 def delete_route(user_id, route_id):
 
-    if not user_id:
-        return None, 'User ID cannot be blank.'
-    if type(user_id) is not int:
-        return None, 'User ID must be an integer.'
+    # Validate the user
+    user, error = validator.validate_user(user_id)
+    if error:
+        return None, error
 
-    user = None
+    # Validate the route
+    route, error = validator.validate_route(route_id)
+    if error:
+        return None, error
 
-    try:
-        user = models.User.query.get(int(user_id))
-    except:
-        return None, 'Error while trying to find user.'
-
-    if not user:
-        return None, 'User does not exist.'
-
-    if not route_id:
-        return None, 'Route ID cannot be blank.'
-    if type(route_id) is not int:
-        return None, 'Route ID must be an integer.'
-
-    route = None
-
-    try:
-        route = models.Route.query.get(int(route_id))
-    except:
-        return None, 'Error while trying to find route.'
-
-    if not route:
-        return None, 'Route does not exist.'
-
-    if route.user.id != user.id:
+    # Make sure the user owns this route
+    if route.user != user:
         return None, 'Route does not belong to user.'
 
+    # Delete the route
     db.session.delete(route)
     db.session.commit()
 
+    # Return the deleted route
     return route, None
 
 @app.route('/route/create', methods=['GET', 'POST'])
@@ -295,3 +252,8 @@ def delete_route_view(id):
             flash(error, 'danger')
 
     return redirect(url_for('dashboard'))
+
+@app.route('/api/1.0/routes')
+@login_required
+def read_routes_api():
+    return jsonify(len(current_user.routes))
