@@ -10,6 +10,8 @@ import sys
 
 ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
+MAX_USERS = 5
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
@@ -97,28 +99,37 @@ def register():
     # If a valid RegistrationForm was submitted
     if form.validate_on_submit():
 
-        # Create the new user
-        user = models.User( 
-            email=form.email.data, 
-            password=form.password.data, 
-            name=form.name.data, 
-            phone=form.phone.data 
-        )
+        # Make sure the user limit hasn't been reached
+        users = models.User.query.all()
 
-        # Add the user to the database
-        db.session.add(user)
+        if len(users) < MAX_USERS:
 
-        # Commit the changes
-        db.session.commit()
+            # Create the new user
+            user = models.User( 
+                email=form.email.data, 
+                password=form.password.data, 
+                name=form.name.data, 
+                phone=form.phone.data 
+            )
 
-        # Print a message to the console
-        print(f'\n{user.email} has registered an account.\n', file=sys.stderr)
+            # Add the user to the database
+            db.session.add(user)
 
-        # Flash a message to the user
-        flash('You are now registered and may log in.', 'success')
+            # Commit the changes
+            db.session.commit()
 
-        # Redirect to the login page
-        return redirect(url_for('login'))
+            # Print a message to the console
+            print(f'\n{user.email} has registered an account.\n', file=sys.stderr)
+
+            # Flash a message to the user
+            flash('You are now registered and may log in.', 'success')
+
+            # Redirect to the login page
+            return redirect(url_for('login'))
+        
+        # If the max user count has been reached
+        else:
+            flash('Sorry. We are not acccepting new users at the moment.', 'danger')
 
     # Send the register page to the user
     return render_template('register.html', user=current_user, form=form)
