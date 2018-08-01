@@ -33,6 +33,8 @@ def dashboard():
             forecast_age = now - location.forecast.updated_at
             if forecast_age > max_forecast_age:
                 weather.update_forecast(location)
+        else:
+            weather.update_forecast(location)
 
     # Get this user's routes
     routes = models.Route.query.filter_by(user_id=current_user.id)
