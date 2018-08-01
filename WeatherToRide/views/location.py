@@ -133,7 +133,7 @@ def create_location_view():
         else:
             flash(error, 'danger')
 
-    return render_template('location/location.html', user=current_user, form=form)
+    return render_template('location.html', user=current_user, form=form)
 
 @app.route('/location/update/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -166,7 +166,7 @@ def update_location_view(id):
         else:
             flash(error, 'danger')
 
-    return render_template('location/location.html', user=current_user, form=form)
+    return render_template('location.html', user=current_user, form=form)
 
 @app.route('/location/delete/<int:id>', methods=['POST'])
 @login_required

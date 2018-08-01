@@ -61,7 +61,7 @@ def login():
             flash('That e-mail address is not registered with an account.', 'danger')
 
     # Send the login page to the user
-    return render_template('auth/login.html', user=current_user, form=form)
+    return render_template('login.html', user=current_user, form=form)
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
@@ -121,7 +121,7 @@ def register():
         return redirect(url_for('login'))
 
     # Send the register page to the user
-    return render_template('auth/register.html', user=current_user, form=form)
+    return render_template('register.html', user=current_user, form=form)
 
 @app.route('/confirm-email/<token>')
 def confirm_email(token):

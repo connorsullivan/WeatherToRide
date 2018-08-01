@@ -50,7 +50,7 @@
         # html = render_template(
 
         #     # The template to send
-        #     'email/confirm.html', 
+        #     'email.html', 
 
         #     # The user that is creating this account
         #     user=user, 

@@ -1,0 +1,54 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+    Add Route
+{% endblock %}
+
+{% block style %}
+    <style> ul { list-style-type: none; } </style>
+{% endblock %}
+
+{% block body %}
+
+    <br><h1>Route</h1><br>
+
+    {% from "includes/_form_helpers.html" import render_field %}
+
+    <form method="POST">
+
+        {{ form.csrf_token }}
+
+        <div class="form-group">
+            {{ render_field( form.name, class_="form-control" )}}
+        </div>
+
+        <div class="form-group">
+            {{ render_field( form.location_1, class_="form-control" )}}
+        </div>
+
+        <div class="form-group">
+            {{ render_field( form.location_2, class_="form-control" )}}
+        </div>
+
+        <div class="form-group">
+            {{ render_field( form.time, class_="form-control" )}}
+        </div>
+
+        <div class="form-group">
+            {{ render_field( form.days, class_="form-control" )}}
+        </div>
+
+        <br><br><br><br><br><br><br>
+
+        <div class="form-group">
+            {{ render_field( form.recaptcha, class_="form-control" )}}
+        </div>
+
+        <br>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+    </form>
+
+{% endblock %}

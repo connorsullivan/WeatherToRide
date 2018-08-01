@@ -15,10 +15,6 @@ max_forecast_age = datetime.timedelta(seconds=900)
 def index():
     return render_template('index.html', user=current_user)
 
-@app.route('/about')
-def about():
-    return render_template('about.html', user=current_user)
-
 @app.route('/dashboard')
 @login_required
 def dashboard():

@@ -16,14 +16,19 @@
         {{ form.csrf_token }}
 
         <div class="form-group">
-            {{ render_field( form.name, class_="form-control" ) }}
+            {{ render_field( form.name, class_="form-control" )}}
         </div>
 
         <div class="form-group">
-            {{ render_field( form.address, class_="form-control", id="address") }}
+            {{ render_field( form.address, class_="form-control", id="address" )}}
+        </div>
+
+        <div class="form-group">
+            {{ render_field( form.recaptcha, class_="form-control" )}}
         </div>
 
         <br>
+
         <div class="btn-group">
             <button type="button" class="btn btn-success" 
                 onclick="getLocation()">Use Current Location</button>

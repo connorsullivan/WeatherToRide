@@ -1,7 +1,7 @@
 
 from . import models
 
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField
 
 from wtforms import PasswordField, SelectField, SelectMultipleField, StringField, SubmitField
 from wtforms.fields.html5 import EmailField, TelField, TimeField
@@ -37,6 +37,8 @@ class LoginForm(FlaskForm):
         DataRequired()
     ])
 
+    recaptcha = RecaptchaField()
+
 class RegistrationForm(FlaskForm):
 
     email = EmailField('Email address', [
@@ -67,6 +69,8 @@ class RegistrationForm(FlaskForm):
         Unique(models.User, models.User.phone, message='That phone number is already in use.')
     ])
 
+    recaptcha = RecaptchaField()
+
 class LocationForm(FlaskForm):
 
     name = StringField( 
@@ -80,6 +84,8 @@ class LocationForm(FlaskForm):
         validators = [ DataRequired(), Length(max=255) ], 
         render_kw={"placeholder": "1720 2nd Ave S, Birmingham, AL 35294"} 
     )
+
+    recaptcha = RecaptchaField()
 
 class RouteForm(FlaskForm):
 
@@ -103,6 +109,8 @@ class RouteForm(FlaskForm):
         (5, 'Saturday'), 
         (6, 'Sunday')
     ])
+
+    recaptcha = RecaptchaField()
 
 class SubmitForm(FlaskForm):
 

@@ -174,7 +174,7 @@ def create_route_view():
         else:
             flash(error, 'danger')
 
-    return render_template('route/route.html', user=current_user, form=form)
+    return render_template('route.html', user=current_user, form=form)
 
 @app.route('/route/update/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -233,7 +233,7 @@ def update_route_view(id):
         else:
             flash(error, 'danger')
 
-    return render_template('route/route.html', user=current_user, form=form)
+    return render_template('route.html', user=current_user, form=form)
 
 @app.route('/route/delete/<int:id>', methods=['POST'])
 @login_required
