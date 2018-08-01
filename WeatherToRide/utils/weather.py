@@ -4,6 +4,9 @@ from .. import app, db, models
 import datetime
 import requests
 
+API_NAME = 'Dark Sky'
+MAX_DAILY_CALLS = 1000
+
 '''
     Mapping Dark Sky forecasts to colorful icons
 
@@ -57,10 +60,42 @@ def get_forecast_from_api(lat, lng):
 
     """
 
+    # Get the current date/time
+    now = datetime.datetime.now()
+
+    # Check for the API key
     try:
         key = app.config['DARKSKY_KEY']
     except:
         return None, 'The Dark Sky API is not configured. Weather services are unavailable.'
+
+    # Get the entry for this API from the database
+    status = models.API.query.filter_by(name=API_NAME).first()
+
+    # If there isn't an entry for this API yet
+    if not status:
+        status = models.API(name=API_NAME)
+        status.calls_today = 0
+        status.calls_total = 0
+        status.last_reset = now
+        db.session.add(status)
+        db.session.commit()
+
+    # Check if the API call limit needs to be refreshed
+    if now.date() > status.last_reset.date():
+        status.calls_today = 0
+        status.last_reset = now
+        db.session.add(status)
+        db.session.commit()
+
+    # Check if the API has reached its call limit for today
+    if status.calls_today >= MAX_DAILY_CALLS:
+        return None, 'The weather service has reached capacity for today. Forecasting will be unavailable until tomorrow.'
+    else:
+        status.calls_today += 1
+        status.calls_total += 1
+        db.session.add(status)
+        db.session.commit()
 
     # Try to query the Dark Sky API
     try:

@@ -1,9 +1,13 @@
 
-from .. import app
+from .. import app, db, models
 
 from urllib.parse import urlencode
 
-import requests as req
+import datetime
+import requests
+
+API_NAME = 'Google Geocode'
+MAX_DAILY_CALLS = 1000
 
 def get_coordinates(address):
 
@@ -47,11 +51,42 @@ def get_coordinates(address):
     # The payload for the API request
     payload = {'address' : address}
 
+    # Get the current date/time
+    now = datetime.datetime.now()
+
     # Check for the API key
     try:
         payload['key'] = app.config['GOOGLE_KEY']
     except:
         return None, None, 'The Google Geocoding API is not configured. Location services are unavailable.'
+
+    # Get the entry for this API from the database
+    status = models.API.query.filter_by(name=API_NAME).first()
+
+    # If there isn't an entry for this API yet
+    if not status:
+        status = models.API(name=API_NAME)
+        status.calls_today = 0
+        status.calls_total = 0
+        status.last_reset = now
+        db.session.add(status)
+        db.session.commit()
+
+    # Check if the API call limit needs to be refreshed
+    if now.date() > status.last_reset.date():
+        status.calls_today = 0
+        status.last_reset = now
+        db.session.add(status)
+        db.session.commit()
+
+    # Check if the API has reached its call limit for today
+    if status.calls_today >= MAX_DAILY_CALLS:
+        return None, None, 'The location service has reached capacity for today. Geocoding will be unavailable until tomorrow.'
+    else:
+        status.calls_today += 1
+        status.calls_total += 1
+        db.session.add(status)
+        db.session.commit()
 
     # Try to query the Google Geocoding API
     try:
@@ -59,7 +94,7 @@ def get_coordinates(address):
         url = f'https://maps.googleapis.com/maps/api/geocode/json?{urlencode(payload)}'
 
         # Extract the JSON response
-        response = req.get(url).json()
+        response = requests.get(url).json()
 
         # Parse the response for the coordinates
         lat = response['results'][0]['geometry']['location']['lat']

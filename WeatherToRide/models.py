@@ -33,9 +33,6 @@ class User(db.Model, UserMixin):
 
     routes = relationship('Route', backref='user', lazy=True)
 
-    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    updated_at = Column(DateTime(timezone=True))
-
     # Map password to _password
     @hybrid_property
     def password(self):
@@ -65,9 +62,6 @@ class Location(db.Model):
 
     forecast = relationship('Forecast', backref='location', lazy=True, uselist=False)
 
-    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    updated_at = Column(DateTime(timezone=True))
-
 class Route(db.Model):
 
     __tablename__ = 'route'
@@ -90,9 +84,6 @@ class Route(db.Model):
     fri = Column(Boolean, nullable=False, default=False)
     sat = Column(Boolean, nullable=False, default=False)
     sun = Column(Boolean, nullable=False, default=False)
-
-    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    updated_at = Column(DateTime(timezone=True))
 
 class Forecast(db.Model):
 
@@ -134,5 +125,17 @@ class Forecast(db.Model):
     day_7_summary = Column(String(255))
     day_7_recommendation = Column(String(255))
 
-    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True))
+
+class API(db.Model):
+
+    __tablename__ = 'api'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    name = Column(String(32), nullable=False)
+
+    calls_today = Column(Integer, nullable=False)
+    calls_total = Column(Integer, nullable=False)
+
+    last_reset = Column(DateTime(timezone=True), nullable=False)
