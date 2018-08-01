@@ -142,7 +142,7 @@ def update_forecast(location):
         return None, 'There was a problem extracting forecast data to the database.'
 
     # Set the update time on the forecast
-    forecast.updated = datetime.datetime.now()
+    forecast.updated_at = datetime.datetime.now()
 
     # Add the forecast to the database
     db.session.add(forecast)

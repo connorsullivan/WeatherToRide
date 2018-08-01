@@ -85,8 +85,6 @@ class LocationForm(FlaskForm):
         render_kw={"placeholder": "1720 2nd Ave S, Birmingham, AL 35294"} 
     )
 
-    recaptcha = RecaptchaField()
-
 class RouteForm(FlaskForm):
 
     name = StringField( 
@@ -109,8 +107,6 @@ class RouteForm(FlaskForm):
         (5, 'Saturday'), 
         (6, 'Sunday')
     ])
-
-    recaptcha = RecaptchaField()
 
 class SubmitForm(FlaskForm):
 

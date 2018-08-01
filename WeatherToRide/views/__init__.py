@@ -30,7 +30,7 @@ def dashboard():
 
     for location in locations:
         if location.forecast:
-            forecast_age = now - location.forecast.updated
+            forecast_age = now - location.forecast.updated_at
             if forecast_age > max_forecast_age:
                 weather.update_forecast(location)
 
