@@ -5,7 +5,7 @@ import datetime
 import requests
 
 API_NAME = 'Dark Sky'
-MAX_DAILY_CALLS = 1000
+MAX_DAILY_CALLS = 500
 
 '''
     Mapping Dark Sky forecasts to colorful icons

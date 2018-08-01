@@ -7,7 +7,7 @@ import datetime
 import requests
 
 API_NAME = 'Google Geocode'
-MAX_DAILY_CALLS = 1000
+MAX_DAILY_CALLS = 500
 
 def get_coordinates(address):
 
