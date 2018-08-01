@@ -33,9 +33,10 @@ def dashboard():
     now = datetime.datetime.now()
 
     for location in locations:
-        forecast_age = now - location.forecast.updated
-        if forecast_age > max_forecast_age:
-            weather.update_forecast(location)
+        if location.forecast:
+            forecast_age = now - location.forecast.updated
+            if forecast_age > max_forecast_age:
+                weather.update_forecast(location)
 
     # Get this user's routes
     routes = models.Route.query.filter_by(user_id=current_user.id)

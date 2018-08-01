@@ -4,9 +4,6 @@ PROJECT_NAME="WeatherToRide"
 
 PROJECT_FOLDER="/var/www/${PROJECT_NAME}"
 
-# Create the project folder (if it doesn't already exist)
-mkdir ${PROJECT_FOLDER}
-
 # Prevent user interaction (for automatic installs)
 export DEBIAN_FRONTEND=noninteractive
 
