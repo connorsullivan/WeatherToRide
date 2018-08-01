@@ -48,16 +48,6 @@ def dashboard():
         routes=routes
     )
 
-@app.route('/users')
-@login_required
-def show_all_users():
-
-    # Get all of the users from the database
-    users = models.User.query.order_by(models.User.id).all()
-
-    # Return the users page
-    return render_template('users.html', user=current_user, users=users)
-
 # Import the other views from this package
 from . import auth
 from . import location

@@ -95,36 +95,36 @@ class Forecast(db.Model):
 
     location_id = Column(Integer, ForeignKey('location.id'), nullable=False)
 
-    day_0_weather = Column(String(32))
-    day_0_summary = Column(String(255))
     day_0_icon = Column(String(32))
+    day_0_summary = Column(String(255))
+    day_0_recommendation = Column(String(255))
 
-    day_1_weather = Column(String(32))
-    day_1_summary = Column(String(255))
     day_1_icon = Column(String(32))
+    day_1_summary = Column(String(255))
+    day_1_recommendation = Column(String(255))
 
-    day_2_weather = Column(String(32))
-    day_2_summary = Column(String(255))
     day_2_icon = Column(String(32))
+    day_2_summary = Column(String(255))
+    day_2_recommendation = Column(String(255))
 
-    day_3_weather = Column(String(32))
-    day_3_summary = Column(String(255))
     day_3_icon = Column(String(32))
+    day_3_summary = Column(String(255))
+    day_3_recommendation = Column(String(255))
 
-    day_4_weather = Column(String(32))
-    day_4_summary = Column(String(255))
     day_4_icon = Column(String(32))
+    day_4_summary = Column(String(255))
+    day_4_recommendation = Column(String(255))
 
-    day_5_weather = Column(String(32))
-    day_5_summary = Column(String(255))
     day_5_icon = Column(String(32))
+    day_5_summary = Column(String(255))
+    day_5_recommendation = Column(String(255))
 
-    day_6_weather = Column(String(32))
-    day_6_summary = Column(String(255))
     day_6_icon = Column(String(32))
+    day_6_summary = Column(String(255))
+    day_6_recommendation = Column(String(255))
 
-    day_7_weather = Column(String(32))
-    day_7_summary = Column(String(255))
     day_7_icon = Column(String(32))
+    day_7_summary = Column(String(255))
+    day_7_recommendation = Column(String(255))
 
     updated = Column(DateTime(timezone=True), nullable=False)

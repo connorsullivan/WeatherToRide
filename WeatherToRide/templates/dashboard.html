@@ -8,13 +8,22 @@
 {% block body %}
 
     <div class="jumbotron text-center">
-        <h1>Hi, {{ user.name }}.</h1><br><br>
+
+        <h1>Hi, {{ user.name }}.</h1>
+
+        <br><br>
+        <div>
+            <img src="{{ url_for('static', filename='icons/weather/clear-day.png') }}">
+        </div>
+        <br><br><br>
+
         <div class="btn-group">
             <a href="{{ url_for('create_location_view') }}" 
                 class="btn btn-success btn-lg" role="button">+ Location</a>
             <a href="{{ url_for('create_route_view') }}" 
                 class="btn btn-primary btn-lg" role="button">+ Route</a>
         </div>
+
     </div>
 
     {% from "includes/_form_helpers.html" import render_field %}
@@ -29,17 +38,31 @@
 
                 <h1>{{ location.name }}</h1>
 
-                <br>
+                {% if location.forecast %}
 
-                <p class="lead">
-                    <h2>{{ location.forecast.day_0_weather }}</h2>
-                    <i class="wi {{ location.forecast.day_0_icon }}"></i>
+                    <br><br>
+                    <div>
+                        <img src="/static/icons/weather/{{ location.forecast.day_0_icon }}.png">
+                    </div>
+                    <br><br>
+
                     <p class="lead">
                         {{ location.forecast.day_0_summary }}
                     </p>
-                </p>
 
-                <br>
+                    <br>
+
+                    <p class="lead">
+                        {{ location.forecast.day_0_recommendation }}
+                    </p>
+
+                    <br><br>
+
+                {% else %}
+
+                    <p>The weather for this location could not be found. Ride carefully!</p>
+
+                {% endif %}
 
                 <div class="btn-group">
 

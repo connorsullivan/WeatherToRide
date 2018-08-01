@@ -5,21 +5,38 @@ import datetime
 import requests
 
 '''
-    Mapping Dark Sky forecasts to CSS icons
+    Mapping Dark Sky forecasts to colorful icons
 
-    CSS source: http://erikflowers.github.io/weather-icons/
+    Icons by: https://www.flaticon.com/
 '''
-css_icon_map = { 
-    'clear-day': 'wi-day-sunny', 
-    'clear-night': 'wi-night-clear', 
-    'rain': 'wi-rain', 
-    'snow': 'wi-snow', 
-    'sleet': 'wi-sleet', 
-    'wind': 'wi-windy', 
-    'fog': 'wi-fog', 
-    'cloudy': 'wi-cloud', 
-    'partly-cloudy-day': 'wi-day-cloudy', 
-    'partly-cloudy-night': 'wi-night-partly-cloudy' 
+icon_map = { 
+    'clear-day': 'clear-day', 
+    'clear-night': 'clear-night', 
+    'rain': 'rain', 
+    'snow': 'snow', 
+    'sleet': 'snow', 
+    'wind': 'wind', 
+    'fog': 'wind', 
+    'cloudy': 'cloudy', 
+    'partly-cloudy-day': 'cloudy-day', 
+    'partly-cloudy-night': 'cloudy-night' 
+}
+
+ride_ok = 'Looks like great weather to go for a ride!'
+ride_warn = 'It should be ok to ride, but be careful!'
+ride_danger = 'It might be a good idea to take the car instead.'
+
+recommendation_map = { 
+    'clear-day': ride_ok, 
+    'clear-night': ride_ok, 
+    'rain': ride_danger, 
+    'snow': ride_danger, 
+    'sleet': ride_danger, 
+    'wind': ride_warn, 
+    'fog': ride_warn, 
+    'cloudy': ride_ok, 
+    'partly-cloudy-day': ride_ok, 
+    'partly-cloudy-night': ride_ok 
 }
 
 def get_forecast_from_api(lat, lng):
@@ -89,37 +106,37 @@ def update_forecast(location):
     # Add the new information to the forecast
     try:
 
-        forecast.day_0_weather = response[0]['icon']
+        forecast.day_0_icon = icon_map.get(response[0]['icon'], 'unknown')
         forecast.day_0_summary = response[0]['summary']
-        forecast.day_0_icon = css_icon_map[response[0]['icon']]
+        forecast.day_0_recommendation = recommendation_map.get(response[0]['icon'], 'YOLO!')
 
-        forecast.day_1_weather = response[1]['icon']
+        forecast.day_1_icon = icon_map.get(response[1]['icon'], 'unknown')
         forecast.day_1_summary = response[1]['summary']
-        forecast.day_1_icon = css_icon_map[response[1]['icon']]
+        forecast.day_1_recommendation = recommendation_map.get(response[1]['icon'], 'YOLO!')
 
-        forecast.day_2_weather = response[2]['icon']
+        forecast.day_2_icon = icon_map.get(response[2]['icon'], 'unknown')
         forecast.day_2_summary = response[2]['summary']
-        forecast.day_2_icon = css_icon_map[response[2]['icon']]
+        forecast.day_2_recommendation = recommendation_map.get(response[2]['icon'], 'YOLO!')
 
-        forecast.day_3_weather = response[3]['icon']
+        forecast.day_3_icon = icon_map.get(response[3]['icon'], 'unknown')
         forecast.day_3_summary = response[3]['summary']
-        forecast.day_3_icon = css_icon_map[response[3]['icon']]
+        forecast.day_3_recommendation = recommendation_map.get(response[3]['icon'], 'YOLO!')
 
-        forecast.day_4_weather = response[4]['icon']
+        forecast.day_4_icon = icon_map.get(response[4]['icon'], 'unknown')
         forecast.day_4_summary = response[4]['summary']
-        forecast.day_4_icon = css_icon_map[response[4]['icon']]
+        forecast.day_4_recommendation = recommendation_map.get(response[4]['icon'], 'YOLO!')
 
-        forecast.day_5_weather = response[5]['icon']
+        forecast.day_5_icon = icon_map.get(response[5]['icon'], 'unknown')
         forecast.day_5_summary = response[5]['summary']
-        forecast.day_5_icon = css_icon_map[response[5]['icon']]
+        forecast.day_5_recommendation = recommendation_map.get(response[5]['icon'], 'YOLO!')
 
-        forecast.day_6_weather = response[6]['icon']
+        forecast.day_6_icon = icon_map.get(response[6]['icon'], 'unknown')
         forecast.day_6_summary = response[6]['summary']
-        forecast.day_6_icon = css_icon_map[response[6]['icon']]
+        forecast.day_6_recommendation = recommendation_map.get(response[6]['icon'], 'YOLO!')
 
-        forecast.day_7_weather = response[7]['icon']
+        forecast.day_7_icon = icon_map.get(response[7]['icon'], 'unknown')
         forecast.day_7_summary = response[7]['summary']
-        forecast.day_7_icon = css_icon_map[response[7]['icon']]
+        forecast.day_7_recommendation = recommendation_map.get(response[7]['icon'], 'YOLO!')
 
     except:
         return None, 'There was a problem extracting forecast data to the database.'
