@@ -51,14 +51,14 @@ def get_coordinates(address):
     # The payload for the API request
     payload = {'address' : address}
 
-    # Get the current date/time
-    now = datetime.datetime.now()
-
     # Check for the API key
     try:
         payload['key'] = app.config['GOOGLE_KEY']
     except:
         return None, None, 'The Google Geocoding API is not configured. Location services are unavailable.'
+
+    # Get the current date/time
+    now = datetime.datetime.now()
 
     # Get the entry for this API from the database
     status = models.API.query.filter_by(name=API_NAME).first()

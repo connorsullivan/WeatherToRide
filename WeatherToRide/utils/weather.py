@@ -60,14 +60,14 @@ def get_forecast_from_api(lat, lng):
 
     """
 
-    # Get the current date/time
-    now = datetime.datetime.now()
-
     # Check for the API key
     try:
         key = app.config['DARKSKY_KEY']
     except:
         return None, 'The Dark Sky API is not configured. Weather services are unavailable.'
+
+    # Get the current date/time
+    now = datetime.datetime.now()
 
     # Get the entry for this API from the database
     status = models.API.query.filter_by(name=API_NAME).first()
