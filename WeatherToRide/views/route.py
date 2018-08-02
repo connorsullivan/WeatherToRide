@@ -3,14 +3,14 @@ from .. import app, db, forms, models
 
 from ..utils import validator
 
-from flask import abort, flash, redirect, render_template, url_for
+from flask import abort, flash, jsonify, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
 import datetime
 
 MAX_ROUTES = 5
 
-def create_or_update_route(user_id, name, location_1_id, location_2_id, time, days, route_id=None):
+def create_or_update_route(user_id, name, location_id_1, location_id_2, days, route_id=None):
 
     # Validate the user
     user, error = validator.validate_user(user_id)
@@ -29,7 +29,7 @@ def create_or_update_route(user_id, name, location_1_id, location_2_id, time, da
         return None, f'Route name cannot be longer than {max_length_name} characters.'
 
     # Validate the first location
-    location_1, error = validator.validate_location(location_1_id)
+    location_1, error = validator.validate_location(location_id_1)
     if error:
         return None, error
 
@@ -37,7 +37,7 @@ def create_or_update_route(user_id, name, location_1_id, location_2_id, time, da
         return None, 'Starting location does not belong to user.'
 
     # Validate the second location
-    location_2, error = validator.validate_location(location_2_id)
+    location_2, error = validator.validate_location(location_id_2)
     if error:
         return None, error
 
@@ -47,12 +47,6 @@ def create_or_update_route(user_id, name, location_1_id, location_2_id, time, da
     # Make sure the two locations are different
     if location_1 == location_2:
         return None, 'Starting and ending locations must be different.'
-
-    # Validate the time
-    if not time:
-        return None, 'Time is required.'
-    if type(time) is not datetime.time:
-        return None, 'Time must be of type datetime.time'
 
     # Validate the days
     if not days:
@@ -83,10 +77,8 @@ def create_or_update_route(user_id, name, location_1_id, location_2_id, time, da
     # Save the new information to this route
     route.name = name
 
-    route.location_1 = location_1.id
-    route.location_2 = location_2.id
-
-    route.time = time
+    route.location_id_1 = location_1.id
+    route.location_id_2 = location_2.id
 
     route.mon = False
     route.tue = False
@@ -154,17 +146,16 @@ def create_route_view():
 
     locations = models.Location.query.filter_by(user_id=current_user.id)
 
-    form.location_1.choices = [(x.id, x.name) for x in locations]
-    form.location_2.choices = [(x.id, x.name) for x in locations]
+    form.location_id_1.choices = [(x.id, x.name) for x in locations]
+    form.location_id_2.choices = [(x.id, x.name) for x in locations]
 
     if form.validate_on_submit():
 
         route, error = create_or_update_route(
             user_id=current_user.id, 
             name=form.name.data, 
-            location_1_id=form.location_1.data, 
-            location_2_id=form.location_2.data, 
-            time=form.time.data, 
+            location_id_1=form.location_id_1.data, 
+            location_id_2=form.location_id_2.data, 
             days=form.days.data
         )
 
@@ -204,25 +195,23 @@ def update_route_view(id):
 
     form = forms.RouteForm(
         name=route.name, 
-        location_1=route.location_1, 
-        location_2=route.location_2, 
-        time=route.time, 
+        location_id_1=route.location_id_1, 
+        location_id_2=route.location_id_2, 
         days=days
     )
 
     locations = models.Location.query.filter_by(user_id=current_user.id)
 
-    form.location_1.choices = [(x.id, x.name) for x in locations]
-    form.location_2.choices = [(x.id, x.name) for x in locations]
+    form.location_id_1.choices = [(x.id, x.name) for x in locations]
+    form.location_id_2.choices = [(x.id, x.name) for x in locations]
 
     if form.validate_on_submit():
 
         route, error = create_or_update_route(
             user_id=current_user.id, 
             name=form.name.data, 
-            location_1_id=form.location_1.data, 
-            location_2_id=form.location_2.data, 
-            time=form.time.data, 
+            location_id_1=form.location_id_1.data, 
+            location_id_2=form.location_id_2.data, 
             days=form.days.data, 
             route_id=route.id
         )
@@ -256,4 +245,19 @@ def delete_route_view(id):
 @app.route('/api/1.0/routes')
 @login_required
 def read_routes_api():
-    return jsonify(len(current_user.routes))
+
+    user_id = current_user.id
+    length = len(current_user.routes)
+    routes = [x.serialize() for x in current_user.routes]
+
+    for route in routes:
+
+        # Get the locations for this route
+        route["routeFrom"] = models.Location.query.get(int(route["routeFrom"])).serialize()
+        route["routeTo"] = models.Location.query.get(int(route["routeTo"])).serialize()
+
+        # Get the forecasts for these locations
+        route["routeFrom"]["forecast"] = models.Forecast.query.filter_by(location_id=int(route["routeFrom"]["locationId"])).first().serialize()
+        route["routeTo"]["forecast"] = models.Forecast.query.filter_by(location_id=int(route["routeTo"]["locationId"])).first().serialize()
+
+    return jsonify({ "userId": user_id, "numberOfRoutes": length, "routes": routes })

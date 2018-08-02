@@ -88,7 +88,7 @@
                 {{ form.csrf_token }}
                 <h1>{{ route.name }}</h1><br>
                 <p class="lead">
-                    {{ route.time }}
+                    {{ route.location_id_1 }} -> {{ route.location_id_2 }}
                 </p><br>
                 <div class="btn-group">
                     <a href="{{ url_for('update_route_view', id=route.id) }}" 

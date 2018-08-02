@@ -93,10 +93,8 @@ class RouteForm(FlaskForm):
         render_kw = {'placeholder': 'Work commute'} 
     )
 
-    location_1 = SelectField('Start destination', coerce=int, validators=[DataRequired()])
-    location_2 = SelectField('Final destination', coerce=int, validators=[DataRequired()])
-
-    time = TimeField('Departure time')
+    location_id_1 = SelectField('Start destination', coerce=int, validators=[DataRequired()])
+    location_id_2 = SelectField('Final destination', coerce=int, validators=[DataRequired()])
 
     days = MultiCheckboxField('Days of week', coerce=int, choices=[
         (0, 'Monday'), 

@@ -47,6 +47,20 @@ class User(db.Model, UserMixin):
     def validate_password(self, plaintext):
         return argon2.verify(plaintext, self._password)
 
+    # Serialize method for JSON API
+    def serialize(self):
+        return {
+            "id": self.id, 
+            "email": self.email, 
+            "email_confirmed": self.email_confirmed, 
+            "password": self.password, 
+            "name": self.name, 
+            "phone": self.phone, 
+            "phone_confirmed": self.phone_confirmed, 
+            "locations": len(self.locations), 
+            "routes": len(self.routes)
+        }
+
 class Location(db.Model):
 
     __tablename__ = 'location'
@@ -62,6 +76,15 @@ class Location(db.Model):
 
     forecast = relationship('Forecast', backref='location', lazy=True, uselist=False)
 
+    # Serialize method for JSON API
+    def serialize(self):
+        return { 
+            "locationId": self.id, 
+            "locationName": self.name, 
+            "locationLat": float(self.lat), 
+            "locationLng": float(self.lng) 
+        }
+
 class Route(db.Model):
 
     __tablename__ = 'route'
@@ -72,10 +95,8 @@ class Route(db.Model):
 
     name = Column(String(32), nullable=False)
 
-    location_1 = Column(Integer, ForeignKey('location.id'), nullable=False)
-    location_2 = Column(Integer, ForeignKey('location.id'), nullable=False)
-
-    time = Column(TIME(), nullable=False)
+    location_id_1 = Column(Integer, ForeignKey('location.id'), nullable=False)
+    location_id_2 = Column(Integer, ForeignKey('location.id'), nullable=False)
 
     mon = Column(Boolean, nullable=False, default=False)
     tue = Column(Boolean, nullable=False, default=False)
@@ -84,6 +105,34 @@ class Route(db.Model):
     fri = Column(Boolean, nullable=False, default=False)
     sat = Column(Boolean, nullable=False, default=False)
     sun = Column(Boolean, nullable=False, default=False)
+
+    # Serialize method for JSON API
+    def serialize(self):
+
+        days = []
+
+        if self.mon:
+            days.append('monday')
+        if self.tue:
+            days.append('tuesday')
+        if self.wed:
+            days.append('wednesday')
+        if self.thu:
+            days.append('thursday')
+        if self.fri:
+            days.append('friday')
+        if self.sat:
+            days.append('saturday')
+        if self.sun:
+            days.append('sunday')
+
+        return { 
+            "routeId": self.id, 
+            "routeName": self.name, 
+            "routeFrom": self.location_id_1, 
+            "routeTo": self.location_id_2, 
+            "routeDays": days 
+        }
 
 class Forecast(db.Model):
 
@@ -126,6 +175,21 @@ class Forecast(db.Model):
     day_7_recommendation = Column(String(255))
 
     updated_at = Column(DateTime(timezone=True))
+
+    # Serialize method for JSON API
+    def serialize(self):
+
+        days = []
+
+        days.append({ "icon": self.day_0_icon, "summary": self.day_0_summary, "recommendation": self.day_0_recommendation })
+        days.append({ "icon": self.day_1_icon, "summary": self.day_1_summary, "recommendation": self.day_1_recommendation })
+        days.append({ "icon": self.day_2_icon, "summary": self.day_2_summary, "recommendation": self.day_2_recommendation })
+        days.append({ "icon": self.day_3_icon, "summary": self.day_3_summary, "recommendation": self.day_3_recommendation })
+        days.append({ "icon": self.day_4_icon, "summary": self.day_4_summary, "recommendation": self.day_4_recommendation })
+        days.append({ "icon": self.day_5_icon, "summary": self.day_5_summary, "recommendation": self.day_5_recommendation })
+        days.append({ "icon": self.day_6_icon, "summary": self.day_6_summary, "recommendation": self.day_6_recommendation })
+
+        return { "forecastDays": days }
 
 class API(db.Model):
 

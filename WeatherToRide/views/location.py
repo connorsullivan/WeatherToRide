@@ -194,4 +194,13 @@ def delete_location_view(id):
 @app.route('/api/1.0/locations')
 @login_required
 def read_locations_api():
-    return jsonify(len(current_user.locations))
+
+    user_id = current_user.id
+    length = len(current_user.locations)
+    locations = [x.serialize() for x in current_user.locations]
+
+    # Get the forecast for each location
+    for location in locations:
+        location["forecast"] = models.Location.query.get(int(location["locationId"])).forecast.serialize()
+
+    return jsonify({ "userId": user_id, "numberOfLocations": length, "locations": locations })
