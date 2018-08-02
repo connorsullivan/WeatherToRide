@@ -1,9 +1,9 @@
 
-from .. import app, db, forms, models
+from .. import app, csrf, db, forms, models
 
 from ..utils import geocode, validator, weather
 
-from flask import abort, flash, jsonify, redirect, render_template, url_for
+from flask import abort, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from sqlalchemy import or_
@@ -191,16 +191,144 @@ def delete_location_view(id):
     # Redirect to the dashboard
     return redirect(url_for('dashboard'))
 
-@app.route('/api/1.0/locations')
-@login_required
-def read_locations_api():
+@app.route('/api/<key>/location/create', methods=['POST'])
+@csrf.exempt
+def create_location_api(key):
 
-    user_id = current_user.id
-    length = len(current_user.locations)
-    locations = [x.serialize() for x in current_user.locations]
+    # Validate the API key
+    dev = models.Developer.query.filter_by(key=key).first()
+    if not dev:
+        return jsonify({"error": "Key is invalid."}), 400
+
+    # Find the user for this key
+    user = dev.user
+
+    # Check that the request is valid
+    if not request.json:
+        abort(400)
+    if not 'locationName' in request.json:
+        abort(400)
+    if not 'locationAddress' in request.json:
+        abort(400)
+
+    # Try to create the location
+    location, error = create_or_update_location( 
+        user_id=user.id, 
+        name=request.json['locationName'], 
+        address=request.json['locationAddress'] 
+    )
+
+    if error:
+        return jsonify({"error": error}), 400
+    else:
+        return jsonify({"createdLocation": location.serialize()})
+
+@app.route('/api/<key>/location/<int:id>')
+@csrf.exempt
+def read_location_api(key, id):
+
+    # Validate the API key
+    dev = models.Developer.query.filter_by(key=key).first()
+    if not dev:
+        return jsonify({"error": "Key is invalid."}), 400
+
+    # Find the user for this key
+    user = dev.user
+
+    # Validate the location
+    location, error = validator.validate_location(id)
+
+    if error:
+        return jsonify({"error": error}), 400
+    
+    location = location.serialize()
+
+    # Get the forecast for this location
+    location["forecast"] = models.Location.query.get(int(location["locationId"])).forecast.serialize()
+
+    return jsonify({"location": location})
+
+@app.route('/api/<key>/location')
+@csrf.exempt
+def read_location_all_api(key):
+
+    # Validate the API key
+    dev = models.Developer.query.filter_by(key=key).first()
+    if not dev:
+        return jsonify({"error": "Key is invalid."}), 400
+
+    # Find the user for this key
+    user = dev.user
+
+    length = len(user.locations)
+    locations = [x.serialize() for x in user.locations]
 
     # Get the forecast for each location
     for location in locations:
         location["forecast"] = models.Location.query.get(int(location["locationId"])).forecast.serialize()
 
-    return jsonify({ "userId": user_id, "numberOfLocations": length, "locations": locations })
+    return jsonify({ "userId": user.id, "numberOfLocations": length, "locations": locations })
+
+@app.route('/api/<key>/location/update', methods=['PUT'])
+@csrf.exempt
+def update_location_api(key):
+
+    # Validate the API key
+    dev = models.Developer.query.filter_by(key=key).first()
+    if not dev:
+        return jsonify({"error": "Key is invalid."}), 400
+
+    # Find the user for this key
+    user = dev.user
+
+    # Check that the request is valid
+    if not request.json:
+        abort(400)
+    if not 'locationId' in request.json:
+        abort(400)
+    if not 'locationName' in request.json:
+        abort(400)
+    if not 'locationAddress' in request.json:
+        abort(400)
+
+    # Try to create the location
+    location, error = create_or_update_location( 
+        user_id=user.id, 
+        name=request.json['locationName'], 
+        address=request.json['locationAddress'], 
+        location_id=request.json['locationId'] 
+    )
+
+    if error:
+        return jsonify({"error": error}), 400
+    else:
+        return jsonify({"updatedLocation": location.serialize()})
+
+@app.route('/api/<key>/location/delete', methods=['DELETE'])
+@csrf.exempt
+def delete_location_api(key):
+
+    # Validate the API key
+    dev = models.Developer.query.filter_by(key=key).first()
+    if not dev:
+        return jsonify({"error": "Key is invalid."}), 400
+
+    # Find the user for this key
+    user = dev.user
+
+    # Check that the request is valid
+    if not request.json:
+        abort(400)
+    if not 'locationId' in request.json:
+        abort(400)
+
+    # Try to delete the location
+    location, error = delete_location(
+        user.id, 
+        request.json['locationId']
+    )
+
+    if error:
+        return jsonify({"error": error}), 400
+    else:
+        return jsonify({"deletedLocation": location.serialize()})

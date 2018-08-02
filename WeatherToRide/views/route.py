@@ -1,5 +1,5 @@
 
-from .. import app, db, forms, models
+from .. import app, csrf, db, forms, models
 
 from ..utils import validator
 
@@ -242,13 +242,20 @@ def delete_route_view(id):
 
     return redirect(url_for('dashboard'))
 
-@app.route('/api/1.0/routes')
-@login_required
-def read_routes_api():
+@app.route('/api/<key>/route')
+@csrf.exempt
+def read_route_api(key):
 
-    user_id = current_user.id
-    length = len(current_user.routes)
-    routes = [x.serialize() for x in current_user.routes]
+    # Validate the API key
+    dev = models.Developer.query.filter_by(key=key).first()
+    if not dev:
+        return jsonify({"error": "Key is invalid."}), 400
+
+    # Find the user for this key
+    user = dev.user
+
+    length = len(user.routes)
+    routes = [x.serialize() for x in user.routes]
 
     for route in routes:
 
@@ -260,4 +267,31 @@ def read_routes_api():
         route["routeFrom"]["forecast"] = models.Forecast.query.filter_by(location_id=int(route["routeFrom"]["locationId"])).first().serialize()
         route["routeTo"]["forecast"] = models.Forecast.query.filter_by(location_id=int(route["routeTo"]["locationId"])).first().serialize()
 
-    return jsonify({ "userId": user_id, "numberOfRoutes": length, "routes": routes })
+    return jsonify({ "userId": user.id, "numberOfRoutes": length, "routes": routes })
+
+@app.route('/api/<key>/route/delete', methods=['DELETE'])
+@csrf.exempt
+def delete_route_api(key):
+
+    # Validate the API key
+    dev = models.Developer.query.filter_by(key=key).first()
+    if not dev:
+        return jsonify({"error": "Key is invalid."}), 400
+
+    # Find the user for this key
+    user = dev.user
+
+    # Check that the request is valid
+    if not request.json or not 'routeId' in request.json:
+        abort(400)
+
+    # Try to delete the route
+    route, error = delete_route(
+        user.id, 
+        request.json['routeId']
+    )
+
+    if error:
+        return jsonify({"error": error}), 400
+    else:
+        return jsonify({"deletedRoute": route.serialize()})

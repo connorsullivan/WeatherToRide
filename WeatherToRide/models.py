@@ -33,6 +33,8 @@ class User(db.Model, UserMixin):
 
     routes = relationship('Route', backref='user', lazy=True)
 
+    dev = relationship('Developer', backref='user', lazy=True, uselist=False)
+
     # Map password to _password
     @hybrid_property
     def password(self):
@@ -203,3 +205,13 @@ class API(db.Model):
     calls_total = Column(Integer, nullable=False)
 
     last_reset = Column(DateTime(timezone=True), nullable=False)
+
+class Developer(db.Model):
+
+    __tablename__ = 'developer'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+
+    key = Column(String(32), nullable=False)
