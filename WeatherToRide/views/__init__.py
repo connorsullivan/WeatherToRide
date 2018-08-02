@@ -70,12 +70,12 @@ def dashboard():
         form=form, 
         locations=locations, 
         routes=routes, 
-        day_2=(today + datetime.timedelta(days=1)).strftime('%A'), 
-        day_3=(today + datetime.timedelta(days=2)).strftime('%A'), 
-        day_4=(today + datetime.timedelta(days=3)).strftime('%A'), 
-        day_5=(today + datetime.timedelta(days=4)).strftime('%A'), 
-        day_6=(today + datetime.timedelta(days=5)).strftime('%A'), 
-        day_7=(today + datetime.timedelta(days=6)).strftime('%A') 
+        day_2=(today + datetime.timedelta(days=2)).strftime('%A'), 
+        day_3=(today + datetime.timedelta(days=3)).strftime('%A'), 
+        day_4=(today + datetime.timedelta(days=4)).strftime('%A'), 
+        day_5=(today + datetime.timedelta(days=5)).strftime('%A'), 
+        day_6=(today + datetime.timedelta(days=6)).strftime('%A'), 
+        day_7=(today + datetime.timedelta(days=7)).strftime('%A') 
     )
 
 # Import the other views from this package
