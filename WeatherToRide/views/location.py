@@ -92,7 +92,7 @@ def delete_location(user_id, location_id):
 
     # Delete any routes using this location
     routes = models.Route.query.filter_by(user_id=user.id)
-    routes = routes.filter(or_(models.Route.location_1 == location.id, models.Route.location_2 == location.id))
+    routes = routes.filter(or_(models.Route.location_id_1 == location.id, models.Route.location_id_2 == location.id))
     if routes:
         for route in routes:
             db.session.delete(route)

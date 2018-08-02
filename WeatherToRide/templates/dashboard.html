@@ -37,18 +37,7 @@
         {% for location in locations %}
             <div class="card">
                 <div class="card-header" data-toggle="collapse" data-target="#location_{{ location.id }}">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <h2>{{ location.name }}</h2>
-                        </div>
-                        <div class="col-md-2 text-right">
-                            <div class="btn-group">
-                                <a href="{{ url_for('update_location_view', id=location.id) }}" 
-                                    class="btn btn-primary" role="button">Update</a>
-                                {{ form.submit(class_="btn btn-danger", value="Remove") }}
-                            </div>
-                        </div>
-                    </div>
+                    <h2>{{ location.name }}</h2>
                 </div>
                 <div id="location_{{ location.id }}" class="collapse {{ 'show' if loop.first }}" data-parent="#dashboard_accordion">
                     <div class="card-body">
@@ -114,7 +103,20 @@
                         {% else %}
                             <p>The weather for this location could not be loaded.</p>
                         {% endif %}
+
+                        <br>
+
+                        <form action="{{ url_for('delete_location_view', id=location.id) }}" method="POST">
+                            {{ form.csrf_token }}
+                            <div class="btn-group">
+                                <a href="{{ url_for('update_location_view', id=location.id) }}" 
+                                    class="btn btn-primary" role="button">Update</a>
+                                {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                            </div>
+                        </form>
+
                     </div>
+
                 </div>
             </div>
         {% endfor %}
@@ -122,18 +124,7 @@
         {% for route in routes %}
             <div class="card">
                 <div class="card-header" data-toggle="collapse" data-target="#route_{{ route.id }}">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <h2>{{ route.name }}</h2>
-                        </div>
-                        <div class="col-md-2 text-right">
-                            <div class="btn-group">
-                                <a href="{{ url_for('update_route_view', id=route.id) }}" 
-                                    class="btn btn-primary" role="button">Update</a>
-                                {{ form.submit(class_="btn btn-danger", value="Remove") }}
-                            </div>
-                        </div>
-                    </div>
+                    <h2>{{ route.name }}</h2>
                 </div>
                 <div id="route_{{ route.id }}" class="collapse" data-parent="#dashboard_accordion">
                     <div class="card-body">
@@ -143,6 +134,15 @@
                         <p class="lead">
                             {{ route.days|join(', ') }}
                         </p>
+                        <br>
+                        <form action="{{ url_for('delete_route_view', id=route.id) }}" method="POST">
+                            {{ form.csrf_token }}
+                            <div class="btn-group">
+                                <a href="{{ url_for('update_route_view', id=route.id) }}" 
+                                    class="btn btn-primary" role="button">Update</a>
+                                {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
