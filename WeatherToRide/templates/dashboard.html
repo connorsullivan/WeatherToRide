@@ -7,14 +7,17 @@
 
 {% block body %}
 
+    <!-- Greeting div -->
     <div class="jumbotron text-center">
 
         <h1>Hi, {{ user.name }}.</h1>
 
         <br><br>
+
         <div>
             <img src="{{ url_for('static', filename='icons/weather/clear-day.png') }}">
         </div>
+
         <br><br><br>
 
         <div class="btn-group">
@@ -26,78 +29,124 @@
 
     </div>
 
+    <!-- Form field rendering macro -->
     {% from "includes/_form_helpers.html" import render_field %}
 
-    {% for location in locations %}
-
-        <div class="jumbotron text-center">
-
-            <form action="{{ url_for('delete_location_view', id=location.id) }}" method="POST">
-
-                {{ form.csrf_token }}
-
-                <h1>{{ location.name }}</h1>
-
-                {% if location.forecast %}
-
-                    <br><br>
-                    <div>
-                        <img src="/static/icons/weather/{{ location.forecast.day_0_icon }}.png">
+    <!-- Dynamic content for dashboard -->
+    <div class="accordion" id="dashboard_accordion">
+        {% for location in locations %}
+            <div class="card">
+                <div class="card-header" data-toggle="collapse" data-target="#location_{{ location.id }}">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <h2>{{ location.name }}</h2>
+                        </div>
+                        <div class="col-md-2 text-right">
+                            <div class="btn-group">
+                                <a href="{{ url_for('update_location_view', id=location.id) }}" 
+                                    class="btn btn-primary" role="button">Update</a>
+                                {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                            </div>
+                        </div>
                     </div>
-                    <br><br>
-
-                    <p class="lead">
-                        {{ location.forecast.day_0_summary }}
-                    </p>
-
-                    <br>
-
-                    <p class="lead">
-                        {{ location.forecast.day_0_recommendation }}
-                    </p>
-
-                    <br><br>
-
-                {% else %}
-
-                    <br>
-                    <p>The weather for this location could not be found.</p>
-                    <br>
-
-                {% endif %}
-
-                <div class="btn-group">
-
-                    <a href="{{ url_for('update_location_view', id=location.id) }}" 
-                        class="btn btn-primary" role="button">Update</a>
-
-                    {{ form.submit(class_="btn btn-danger", value="Remove") }}
-
                 </div>
-
-            </form>
-
-        </div>
-
-    {% endfor %}
-
-    {% for route in routes %}
-
-        <div class="jumbotron text-center">
-            <form action="{{ url_for('delete_route_view', id=route.id) }}" method="POST">
-                {{ form.csrf_token }}
-                <h1>{{ route.name }}</h1><br>
-                <p class="lead">
-                    {{ route.location_id_1 }} -> {{ route.location_id_2 }}
-                </p><br>
-                <div class="btn-group">
-                    <a href="{{ url_for('update_route_view', id=route.id) }}" 
-                        class="btn btn-primary" role="button">Update</a>
-                    {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                <div id="location_{{ location.id }}" class="collapse {{ 'show' if loop.first }}" data-parent="#dashboard_accordion">
+                    <div class="card-body">
+                        {% if location.forecast %}
+                            <div id="location_carousel_{{ location.id }}" class="carousel slide" data-ride="carousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <h5>Today</h5>
+                                        <br><img src="/static/icons/weather/{{ location.forecast.day_0_icon }}.png"><br><br>
+                                        <p class="lead">{{ location.forecast.day_0_summary }}</p>
+                                        <p class="lead">{{ location.forecast.day_0_recommendation }}</p>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <h5>Tomorrow</h5>
+                                        <br><img src="/static/icons/weather/{{ location.forecast.day_1_icon }}.png"><br><br>
+                                        <p class="lead">{{ location.forecast.day_1_summary }}</p>
+                                        <p class="lead">{{ location.forecast.day_1_recommendation }}</p>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <h5>{{ day2 }}</h5>
+                                        <br><img src="/static/icons/weather/{{ location.forecast.day_2_icon }}.png"><br><br>
+                                        <p class="lead">{{ location.forecast.day_2_summary }}</p>
+                                        <p class="lead">{{ location.forecast.day_2_recommendation }}</p>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <h5>{{ day3 }}</h5>
+                                        <br><img src="/static/icons/weather/{{ location.forecast.day_3_icon }}.png"><br><br>
+                                        <p class="lead">{{ location.forecast.day_3_summary }}</p>
+                                        <p class="lead">{{ location.forecast.day_3_recommendation }}</p>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <h5>{{ day4 }}</h5>
+                                        <br><img src="/static/icons/weather/{{ location.forecast.day_4_icon }}.png"><br><br>
+                                        <p class="lead">{{ location.forecast.day_4_summary }}</p>
+                                        <p class="lead">{{ location.forecast.day_4_recommendation }}</p>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <h5>{{ day5 }}</h5>
+                                        <br><img src="/static/icons/weather/{{ location.forecast.day_5_icon }}.png"><br><br>
+                                        <p class="lead">{{ location.forecast.day_5_summary }}</p>
+                                        <p class="lead">{{ location.forecast.day_5_recommendation }}</p>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <h5>{{ day6 }}</h5>
+                                        <br><img src="/static/icons/weather/{{ location.forecast.day_6_icon }}.png"><br><br>
+                                        <p class="lead">{{ location.forecast.day_6_summary }}</p>
+                                        <p class="lead">{{ location.forecast.day_6_recommendation }}</p>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <h5>Next {{ day7 }}</h5>
+                                        <br><img src="/static/icons/weather/{{ location.forecast.day_7_icon }}.png"><br><br>
+                                        <p class="lead">{{ location.forecast.day_7_summary }}</p>
+                                        <p class="lead">{{ location.forecast.day_7_recommendation }}</p>
+                                    </div>
+                                </div>
+                                <a class="carousel-control-prev" href="#location_carousel_{{ location.id }}" role="button" data-slide="prev">
+                                    <span class="carousel-control-prev-icon" style="color: black;"></span>
+                                </a>
+                                <a class="carousel-control-next" href="#location_carousel_{{ location.id }}" role="button" data-slide="next">
+                                    <span class="carousel-control-next-icon" style="color: black;"></span>
+                                </a>
+                            </div>
+                        {% else %}
+                            <p>The weather for this location could not be loaded.</p>
+                        {% endif %}
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        {% endfor %}
 
-    {% endfor %}
+        {% for route in routes %}
+            <div class="card">
+                <div class="card-header" data-toggle="collapse" data-target="#route_{{ route.id }}">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <h2>{{ route.name }}</h2>
+                        </div>
+                        <div class="col-md-2 text-right">
+                            <div class="btn-group">
+                                <a href="{{ url_for('update_route_view', id=route.id) }}" 
+                                    class="btn btn-primary" role="button">Update</a>
+                                {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="route_{{ route.id }}" class="collapse" data-parent="#dashboard_accordion">
+                    <div class="card-body">
+                        <p class="lead">
+                            {{ route.location_1.name }} to {{ route.location_2.name }}
+                        </p>
+                        <p class="lead">
+                            {{ route.days|join(', ') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
 {% endblock %}

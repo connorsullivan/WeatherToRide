@@ -37,14 +37,45 @@ def dashboard():
             weather.update_forecast(location)
 
     # Get this user's routes
-    routes = models.Route.query.filter_by(user_id=current_user.id)
+    rs = models.Route.query.filter_by(user_id=current_user.id)
+    routes = []
+    for i, r in enumerate(rs):
+        routes.append({ 
+            'id': r.id, 
+            'name': r.name, 
+            'location_1': models.Location.query.get(int(r.location_id_1)), 
+            'location_2': models.Location.query.get(int(r.location_id_2)), 
+            'days': [] 
+        })
+        if r.mon:
+            routes[i]['days'].append('Mondays')
+        if r.tue:
+            routes[i]['days'].append('Tuesdays')
+        if r.wed:
+            routes[i]['days'].append('Wednesdays')
+        if r.thu:
+            routes[i]['days'].append('Thursdays')
+        if r.fri:
+            routes[i]['days'].append('Fridays')
+        if r.sat:
+            routes[i]['days'].append('Saturdays')
+        if r.sun:
+            routes[i]['days'].append('Sundays')
+
+    today = now.date()
 
     # Return the dashboard page
     return render_template('dashboard.html', 
         user=current_user, 
         form=form, 
         locations=locations, 
-        routes=routes
+        routes=routes, 
+        day_2=(today + datetime.timedelta(days=1)).strftime('%A'), 
+        day_3=(today + datetime.timedelta(days=2)).strftime('%A'), 
+        day_4=(today + datetime.timedelta(days=3)).strftime('%A'), 
+        day_5=(today + datetime.timedelta(days=4)).strftime('%A'), 
+        day_6=(today + datetime.timedelta(days=5)).strftime('%A'), 
+        day_7=(today + datetime.timedelta(days=6)).strftime('%A') 
     )
 
 # Import the other views from this package
