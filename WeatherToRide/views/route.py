@@ -167,6 +167,44 @@ def create_route_view():
 
     return render_template('route-form.html', user=current_user, form=form)
 
+@app.route('/routes')
+@login_required
+def route_dashboard():
+
+    # Get a SubmitForm from forms.py
+    form = forms.SubmitForm()
+
+    # Get this user's routes
+    rs = current_user.routes
+
+    routes = []
+    for i, r in enumerate(rs):
+        routes.append({ 
+            'id': r.id, 
+            'name': r.name, 
+            'location_1': models.Location.query.get(int(r.location_id_1)), 
+            'location_2': models.Location.query.get(int(r.location_id_2)), 
+            'days': [] 
+        })
+
+        if r.mon:
+            routes[i]['days'].append('Mondays')
+        if r.tue:
+            routes[i]['days'].append('Tuesdays')
+        if r.wed:
+            routes[i]['days'].append('Wednesdays')
+        if r.thu:
+            routes[i]['days'].append('Thursdays')
+        if r.fri:
+            routes[i]['days'].append('Fridays')
+        if r.sat:
+            routes[i]['days'].append('Saturdays')
+        if r.sun:
+            routes[i]['days'].append('Sundays')
+
+    # Return the route dashboard page
+    return render_template('routes.html', user=current_user, form=form, routes=routes)
+
 @app.route('/route/update/<int:id>', methods=['GET', 'POST'])
 @login_required
 def update_route_view(id):

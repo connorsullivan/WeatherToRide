@@ -8,8 +8,13 @@ from flask_login import current_user, login_required
 
 from sqlalchemy import or_
 
+import datetime
+
 # Limit how many locations a user can have at one time
 MAX_LOCATIONS = 5
+
+# How old can forecasts be before needing to be refreshed?
+MAX_FORECAST_AGE = datetime.timedelta(seconds=900)
 
 def create_or_update_location(user_id, name, address, location_id=None):
 
@@ -172,6 +177,90 @@ def create_location_api(key):
     else:
         return jsonify({"error": error}), 400
 
+@app.route('/locations')
+@login_required
+def location_dashboard():
+
+    # Get a SubmitForm from forms.py
+    form = forms.SubmitForm()
+
+    # Get this user's locations
+    locations = current_user.locations
+
+    # Get the current time
+    now = datetime.datetime.now()
+
+    # Update the forecast for locations if needed
+    for location in locations:
+        if location.forecast:
+            forecast_age = now - location.forecast.updated_at
+            if forecast_age > MAX_FORECAST_AGE:
+                weather.update_forecast(location)
+        else:
+            weather.update_forecast(location)
+
+    # Get the current date
+    today = now.date()
+
+    # Return the location dashboard page
+    return render_template('locations.html', 
+        user=current_user, 
+        form=form, 
+        locations=locations, 
+        day_2=(today + datetime.timedelta(days=2)).strftime('%A'), 
+        day_3=(today + datetime.timedelta(days=3)).strftime('%A'), 
+        day_4=(today + datetime.timedelta(days=4)).strftime('%A'), 
+        day_5=(today + datetime.timedelta(days=5)).strftime('%A'), 
+        day_6=(today + datetime.timedelta(days=6)).strftime('%A'), 
+        day_7=(today + datetime.timedelta(days=7)).strftime('%A')
+    )
+
+@app.route('/api/<key>/locations')
+@csrf.exempt
+def read_locations_api(key):
+
+    # Validate the API key
+    dev = models.Developer.query.filter_by(key=key).first()
+    if not dev:
+        return jsonify({"error": "Key is invalid."}), 400
+
+    # Find the user for this key
+    user = dev.user
+
+    length = len(user.locations)
+    locations = [x.serialize() for x in user.locations]
+
+    # Get the forecast for each location
+    for location in locations:
+        location["forecast"] = models.Location.query.get(int(location["locationId"])).forecast.serialize()
+
+    return jsonify({ "userId": user.id, "numberOfLocations": length, "locations": locations })
+
+@app.route('/api/<key>/location/<int:id>')
+@csrf.exempt
+def read_location_api(key, id):
+
+    # Validate the API key
+    dev = models.Developer.query.filter_by(key=key).first()
+    if not dev:
+        return jsonify({"error": "Key is invalid."}), 400
+
+    # Find the user for this key
+    user = dev.user
+
+    # Validate the location
+    location, error = validator.validate_location(id)
+
+    if error:
+        return jsonify({"error": error}), 400
+    
+    location = location.serialize()
+
+    # Get the forecast for this location
+    location["forecast"] = models.Location.query.get(int(location["locationId"])).forecast.serialize()
+
+    return jsonify({"location": location})
+
 @app.route('/location/update/<int:id>', methods=['GET', 'POST'])
 @login_required
 def update_location_view(id):
@@ -298,49 +387,3 @@ def delete_location_api(key):
         return jsonify({"deletedLocation": location.serialize()})
     else:
         return jsonify({"error": error}), 400
-
-@app.route('/api/<key>/location/<int:id>')
-@csrf.exempt
-def read_location_api(key, id):
-
-    # Validate the API key
-    dev = models.Developer.query.filter_by(key=key).first()
-    if not dev:
-        return jsonify({"error": "Key is invalid."}), 400
-
-    # Find the user for this key
-    user = dev.user
-
-    # Validate the location
-    location, error = validator.validate_location(id)
-
-    if error:
-        return jsonify({"error": error}), 400
-    
-    location = location.serialize()
-
-    # Get the forecast for this location
-    location["forecast"] = models.Location.query.get(int(location["locationId"])).forecast.serialize()
-
-    return jsonify({"location": location})
-
-@app.route('/api/<key>/location')
-@csrf.exempt
-def read_location_all_api(key):
-
-    # Validate the API key
-    dev = models.Developer.query.filter_by(key=key).first()
-    if not dev:
-        return jsonify({"error": "Key is invalid."}), 400
-
-    # Find the user for this key
-    user = dev.user
-
-    length = len(user.locations)
-    locations = [x.serialize() for x in user.locations]
-
-    # Get the forecast for each location
-    for location in locations:
-        location["forecast"] = models.Location.query.get(int(location["locationId"])).forecast.serialize()
-
-    return jsonify({ "userId": user.id, "numberOfLocations": length, "locations": locations })
