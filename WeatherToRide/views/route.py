@@ -161,11 +161,11 @@ def create_route_view():
 
         if route and not error:
             flash('The route was successfully added!', 'success')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('route_dashboard'))
         else:
             flash(error, 'danger')
 
-    return render_template('route.html', user=current_user, form=form)
+    return render_template('route-form.html', user=current_user, form=form)
 
 @app.route('/route/update/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -218,11 +218,11 @@ def update_route_view(id):
 
         if route and not error:
             flash('The route was successfully updated!', 'success')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('route_dashboard'))
         else:
             flash(error, 'danger')
 
-    return render_template('route.html', user=current_user, form=form)
+    return render_template('route-form.html', user=current_user, form=form)
 
 @app.route('/route/delete/<int:id>', methods=['POST'])
 @login_required
@@ -236,11 +236,10 @@ def delete_route_view(id):
 
         if route and not error:
             flash('The route was successfully deleted!', 'success')
-            return redirect(url_for('dashboard'))
         else:
             flash(error, 'danger')
 
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('route_dashboard'))
 
 @app.route('/api/<key>/route')
 @csrf.exempt

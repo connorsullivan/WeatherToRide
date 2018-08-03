@@ -1,0 +1,47 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ user.name }}'s Routes
+{% endblock %}
+
+{% block body %}
+
+    <!-- Greeting div -->
+    <div class="jumbotron text-center">
+
+        <h1>Hi, {{ user.name }}.</h1>
+
+        <br><br>
+
+        <img src="{{ url_for('static', filename='icons/weather/clear-day.png') }}">
+
+        <br><br>
+        <br><br>
+
+        <a href="{{ url_for('create_route_view') }}" 
+            class="btn btn-primary btn-lg" role="button">+ Route</a>
+
+    </div>
+
+    <!-- Form field rendering macro -->
+    {% from "includes/_form_helpers.html" import render_field %}
+
+    {% for route in routes %}
+
+        <div class="jumbotron text-center">
+            <h2>{{ route.name }}</h2>
+            <br><br>
+            <form action="{{ url_for('delete_route_view', id=route.id) }}" method="POST">
+                {{ form.csrf_token }}
+                <div class="btn-group">
+                    <a href="{{ url_for('update_route_view', id=route.id) }}" 
+                        class="btn btn-primary" role="button">Update</a>
+                    {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                </div>
+            </form>
+        </div>
+
+    {% endfor %}
+
+{% endblock %}

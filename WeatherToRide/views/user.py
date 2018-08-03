@@ -17,15 +17,15 @@ def login():
 
     # Redirect if the user is already logged in
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('location_dashboard'))
 
-    # Get an instance of the LoginForm from forms.py
+    # Get a LoginForm from forms.py
     form = forms.LoginForm()
 
-    # If a valid LoginForm was submitted
+    # Validate a submitted form
     if form.validate_on_submit():
 
-        # Extract the user credentials from the form
+        # Extract the user credentials
         email = form.email.data
         password = form.password.data
 
@@ -48,7 +48,7 @@ def login():
                 flash(f'Welcome, {current_user.name}.', 'success')
 
                 # Redirect to the dashboard
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('location_dashboard'))
 
             # If the password is incorrect
             else:
@@ -91,7 +91,7 @@ def register():
         flash('Please log out before trying to register a new account.', 'danger')
 
         # Redirect to the dashboard
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('location_dashboard'))
 
     # Get an instance of the RegistrationForm from forms.py
     form = forms.RegistrationForm()

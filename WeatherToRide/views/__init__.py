@@ -15,19 +15,20 @@ max_forecast_age = datetime.timedelta(seconds=900)
 def index():
     return render_template('index.html', user=current_user)
 
-@app.route('/dashboard')
+@app.route('/locations')
 @login_required
-def dashboard():
+def location_dashboard():
 
-    # Get an instance of the SubmitForm from forms.py
+    # Get a SubmitForm from forms.py
     form = forms.SubmitForm()
 
     # Get this user's locations
-    locations = models.Location.query.filter_by(user_id=current_user.id)
+    locations = current_user.locations
 
-    # Update the forecasting information if needed
+    # Get the current time
     now = datetime.datetime.now()
 
+    # Update the forecast for locations if needed
     for location in locations:
         if location.forecast:
             forecast_age = now - location.forecast.updated_at
@@ -36,8 +37,32 @@ def dashboard():
         else:
             weather.update_forecast(location)
 
+    # Get the current date
+    today = now.date()
+
+    # Return the location dashboard page
+    return render_template('locations.html', 
+        user=current_user, 
+        form=form, 
+        locations=locations, 
+        day_2=(today + datetime.timedelta(days=2)).strftime('%A'), 
+        day_3=(today + datetime.timedelta(days=3)).strftime('%A'), 
+        day_4=(today + datetime.timedelta(days=4)).strftime('%A'), 
+        day_5=(today + datetime.timedelta(days=5)).strftime('%A'), 
+        day_6=(today + datetime.timedelta(days=6)).strftime('%A'), 
+        day_7=(today + datetime.timedelta(days=7)).strftime('%A')
+    )
+
+@app.route('/routes')
+@login_required
+def route_dashboard():
+
+    # Get a SubmitForm from forms.py
+    form = forms.SubmitForm()
+
     # Get this user's routes
-    rs = models.Route.query.filter_by(user_id=current_user.id)
+    rs = current_user.routes
+
     routes = []
     for i, r in enumerate(rs):
         routes.append({ 
@@ -47,6 +72,7 @@ def dashboard():
             'location_2': models.Location.query.get(int(r.location_id_2)), 
             'days': [] 
         })
+
         if r.mon:
             routes[i]['days'].append('Mondays')
         if r.tue:
@@ -62,23 +88,10 @@ def dashboard():
         if r.sun:
             routes[i]['days'].append('Sundays')
 
-    today = now.date()
-
-    # Return the dashboard page
-    return render_template('dashboard.html', 
-        user=current_user, 
-        form=form, 
-        locations=locations, 
-        routes=routes, 
-        day_2=(today + datetime.timedelta(days=2)).strftime('%A'), 
-        day_3=(today + datetime.timedelta(days=3)).strftime('%A'), 
-        day_4=(today + datetime.timedelta(days=4)).strftime('%A'), 
-        day_5=(today + datetime.timedelta(days=5)).strftime('%A'), 
-        day_6=(today + datetime.timedelta(days=6)).strftime('%A'), 
-        day_7=(today + datetime.timedelta(days=7)).strftime('%A') 
-    )
+    # Return the route dashboard page
+    return render_template('routes.html', user=current_user, form=form, routes=routes)
 
 # Import the other views from this package
-from . import auth
+from . import user
 from . import location
 from . import route

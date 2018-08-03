@@ -116,8 +116,10 @@ def delete_location(user_id, location_id):
 @login_required
 def create_location_view():
 
+    # Get a LocationForm from forms.py
     form = forms.LocationForm()
 
+    # Validate a submitted form
     if form.validate_on_submit():
 
         # Try to add the location to the database
@@ -127,69 +129,15 @@ def create_location_view():
             address=form.address.data
         )
 
+        # Check if the location was added
         if location and not error:
-            flash('The location was successfully added!', 'success')
-            return redirect(url_for('dashboard'))
+            flash('The location was successfully created!', 'success')
+            return redirect(url_for('location_dashboard'))
         else:
             flash(error, 'danger')
 
-    return render_template('location.html', user=current_user, form=form)
-
-@app.route('/location/update/<int:id>', methods=['GET', 'POST'])
-@login_required
-def update_location_view(id):
-
-    # Try to get the location from the database
-    location = models.Location.query.get(int(id))
-    if not location:
-        abort(404)
-
-    # Create a form with the pre-existing values populated
-    form = forms.LocationForm(
-        name=location.name, 
-        address=f'<<<{location.lat},{location.lng}>>>'
-    )
-
-    if form.validate_on_submit():
-
-        # Try to update the location in the database
-        location, error = create_or_update_location(
-            user_id=current_user.id, 
-            name=form.name.data, 
-            address=form.address.data, 
-            location_id=location.id
-        )
-
-        if location and not error:
-            flash('The location was successfully added!', 'success')
-            return redirect(url_for('dashboard'))
-        else:
-            flash(error, 'danger')
-
-    return render_template('location.html', user=current_user, form=form)
-
-@app.route('/location/delete/<int:id>', methods=['POST'])
-@login_required
-def delete_location_view(id):
-
-    form = forms.SubmitForm()
-
-    if form.validate_on_submit():
-
-        # Try to delete the location
-        location, error = delete_location(
-            user_id=current_user.id, 
-            location_id=id
-        )
-
-        if location and not error:
-            flash('The location was successfully deleted!', 'success')
-            return redirect(url_for('dashboard'))
-        else:
-            flash(error, 'danger')
-
-    # Redirect to the dashboard
-    return redirect(url_for('dashboard'))
+    # Return the location template
+    return render_template('location-form.html', user=current_user, form=form)
 
 @app.route('/api/<key>/location/create', methods=['POST'])
 @csrf.exempt
@@ -211,17 +159,145 @@ def create_location_api(key):
     if not 'locationAddress' in request.json:
         abort(400)
 
-    # Try to create the location
-    location, error = create_or_update_location( 
+    # Try to add the location to the database
+    location, error = create_or_update_location(
         user_id=user.id, 
         name=request.json['locationName'], 
-        address=request.json['locationAddress'] 
+        address=request.json['locationAddress']
     )
 
-    if error:
-        return jsonify({"error": error}), 400
-    else:
+    # Check if the location was created
+    if location and not error:
         return jsonify({"createdLocation": location.serialize()})
+    else:
+        return jsonify({"error": error}), 400
+
+@app.route('/location/update/<int:id>', methods=['GET', 'POST'])
+@login_required
+def update_location_view(id):
+
+    # Try to get the location from the database
+    location = models.Location.query.get(int(id))
+    if not location:
+        abort(404)
+
+    # Create a LocationForm with the current values populated
+    form = forms.LocationForm(
+        name=location.name, 
+        address=f'<<<{location.lat},{location.lng}>>>'
+    )
+
+    # Validate a submitted form
+    if form.validate_on_submit():
+
+        # Try to update the location in the database
+        location, error = create_or_update_location(
+            user_id=current_user.id, 
+            name=form.name.data, 
+            address=form.address.data, 
+            location_id=location.id
+        )
+
+        # Check if the location was updated
+        if location and not error:
+            flash('The location was successfully added!', 'success')
+            return redirect(url_for('location_dashboard'))
+        else:
+            flash(error, 'danger')
+
+    # Return the location template
+    return render_template('location-form.html', user=current_user, form=form)
+
+@app.route('/api/<key>/location/update', methods=['POST'])
+@csrf.exempt
+def update_location_api(key):
+
+    # Validate the API key
+    dev = models.Developer.query.filter_by(key=key).first()
+    if not dev:
+        return jsonify({"error": "Key is invalid."}), 400
+
+    # Find the user for this key
+    user = dev.user
+
+    # Check that the request is valid
+    if not request.json:
+        abort(400)
+    if not 'locationId' in request.json:
+        abort(400)
+    if not 'locationName' in request.json:
+        abort(400)
+    if not 'locationAddress' in request.json:
+        abort(400)
+
+    # Try to update the location in the database
+    location, error = create_or_update_location(
+        user_id=user.id, 
+        name=request.json['locationName'], 
+        address=request.json['locationAddress'], 
+        location_id=request.json['locationId']
+    )
+
+    # Check if the location was updated
+    if location and not error:
+        return jsonify({"updatedLocation": location.serialize()})
+    else:
+        return jsonify({"error": error}), 400
+
+@app.route('/location/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_location_view(id):
+
+    # Get a SubmitForm from forms.py
+    form = forms.SubmitForm()
+
+    # Validate a submitted form
+    if form.validate_on_submit():
+
+        # Try to delete the location from the database
+        location, error = delete_location(
+            user_id=current_user.id, 
+            location_id=id
+        )
+
+        # Check if the location was deleted
+        if location and not error:
+            flash('The location was successfully deleted!', 'success')
+        else:
+            flash(error, 'danger')
+
+    # Redirect to the dashboard
+    return redirect(url_for('location_dashboard'))
+
+@app.route('/api/<key>/location/delete', methods=['POST'])
+@csrf.exempt
+def delete_location_api(key):
+
+    # Validate the API key
+    dev = models.Developer.query.filter_by(key=key).first()
+    if not dev:
+        return jsonify({"error": "Key is invalid."}), 400
+
+    # Find the user for this key
+    user = dev.user
+
+    # Check that the request is valid
+    if not request.json:
+        abort(400)
+    if not 'locationId' in request.json:
+        abort(400)
+
+    # Try to delete the location from the database
+    location, error = delete_location(
+        user.id, 
+        request.json['locationId']
+    )
+
+    # Check if the location was deleted
+    if location and not error:
+        return jsonify({"deletedLocation": location.serialize()})
+    else:
+        return jsonify({"error": error}), 400
 
 @app.route('/api/<key>/location/<int:id>')
 @csrf.exempt
@@ -268,67 +344,3 @@ def read_location_all_api(key):
         location["forecast"] = models.Location.query.get(int(location["locationId"])).forecast.serialize()
 
     return jsonify({ "userId": user.id, "numberOfLocations": length, "locations": locations })
-
-@app.route('/api/<key>/location/update', methods=['PUT'])
-@csrf.exempt
-def update_location_api(key):
-
-    # Validate the API key
-    dev = models.Developer.query.filter_by(key=key).first()
-    if not dev:
-        return jsonify({"error": "Key is invalid."}), 400
-
-    # Find the user for this key
-    user = dev.user
-
-    # Check that the request is valid
-    if not request.json:
-        abort(400)
-    if not 'locationId' in request.json:
-        abort(400)
-    if not 'locationName' in request.json:
-        abort(400)
-    if not 'locationAddress' in request.json:
-        abort(400)
-
-    # Try to create the location
-    location, error = create_or_update_location( 
-        user_id=user.id, 
-        name=request.json['locationName'], 
-        address=request.json['locationAddress'], 
-        location_id=request.json['locationId'] 
-    )
-
-    if error:
-        return jsonify({"error": error}), 400
-    else:
-        return jsonify({"updatedLocation": location.serialize()})
-
-@app.route('/api/<key>/location/delete', methods=['DELETE'])
-@csrf.exempt
-def delete_location_api(key):
-
-    # Validate the API key
-    dev = models.Developer.query.filter_by(key=key).first()
-    if not dev:
-        return jsonify({"error": "Key is invalid."}), 400
-
-    # Find the user for this key
-    user = dev.user
-
-    # Check that the request is valid
-    if not request.json:
-        abort(400)
-    if not 'locationId' in request.json:
-        abort(400)
-
-    # Try to delete the location
-    location, error = delete_location(
-        user.id, 
-        request.json['locationId']
-    )
-
-    if error:
-        return jsonify({"error": error}), 400
-    else:
-        return jsonify({"deletedLocation": location.serialize()})
