@@ -19,7 +19,7 @@
         <br><br>
         <br><br>
 
-        <a href="{{ url_for('create_route_view') }}" 
+        <a href="{{ url_for('route_create_view') }}" 
             class="btn btn-primary btn-lg" role="button">+ Route</a>
 
     </div>
@@ -32,10 +32,10 @@
         <div class="jumbotron text-center">
             <h2>{{ route.name }}</h2>
             <br><br>
-            <form action="{{ url_for('delete_route_view', id=route.id) }}" method="POST">
+            <form action="{{ url_for('route_delete_view', id=route.id) }}" method="POST">
                 {{ form.csrf_token }}
                 <div class="btn-group">
-                    <a href="{{ url_for('update_route_view', id=route.id) }}" 
+                    <a href="{{ url_for('route_update_view', id=route.id) }}" 
                         class="btn btn-primary" role="button">Update</a>
                     {{ form.submit(class_="btn btn-danger", value="Remove") }}
                 </div>

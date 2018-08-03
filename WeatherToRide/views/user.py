@@ -47,8 +47,8 @@ def login():
                 # Flash a message to the user
                 flash(f'Welcome, {current_user.name}.', 'success')
 
-                # Redirect to the dashboard
-                return redirect(url_for('location_dashboard'))
+                # Return the location view
+                return redirect(url_for('location_view'))
 
             # If the password is incorrect
             else:
@@ -90,8 +90,8 @@ def register():
         # Flash a message to the user
         flash('Please log out before trying to register a new account.', 'danger')
 
-        # Redirect to the dashboard
-        return redirect(url_for('location_dashboard'))
+        # Return the location view
+        return redirect(url_for('location_view'))
 
     # Get an instance of the RegistrationForm from forms.py
     form = forms.RegistrationForm()

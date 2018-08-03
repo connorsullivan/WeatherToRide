@@ -4,11 +4,9 @@ from . import models
 from flask_wtf import FlaskForm, RecaptchaField
 
 from wtforms import PasswordField, SelectField, SelectMultipleField, StringField, SubmitField
-from wtforms.fields.html5 import EmailField, TelField, TimeField
+from wtforms.fields.html5 import EmailField, TelField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from wtforms.widgets import CheckboxInput, ListWidget
-
-import datetime
 
 class MultiCheckboxField(SelectMultipleField):
 

@@ -6,12 +6,8 @@ from flask_login import UserMixin
 from passlib.hash import argon2
 
 from sqlalchemy import Boolean, Column, DateTime, DECIMAL, ForeignKey, Integer, String
-from sqlalchemy.dialects.mysql import TIME
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-
-import datetime
 
 class User(db.Model, UserMixin):
 
@@ -51,7 +47,7 @@ class User(db.Model, UserMixin):
 
     # Serialize method for JSON API
     def serialize(self):
-        return {
+        return { 
             "id": self.id, 
             "email": self.email, 
             "email_confirmed": self.email_confirmed, 
@@ -60,7 +56,7 @@ class User(db.Model, UserMixin):
             "phone": self.phone, 
             "phone_confirmed": self.phone_confirmed, 
             "locations": len(self.locations), 
-            "routes": len(self.routes)
+            "routes": len(self.routes) 
         }
 
 class Location(db.Model):
@@ -71,10 +67,10 @@ class Location(db.Model):
 
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
-    name = Column(String(32), nullable=False)
-
     lat = Column(DECIMAL(precision=10, scale=6), nullable=False)
     lng = Column(DECIMAL(precision=10, scale=6), nullable=False)
+
+    name = Column(String(32), nullable=False)
 
     forecast = relationship('Forecast', backref='location', lazy=True, uselist=False)
 
@@ -82,9 +78,9 @@ class Location(db.Model):
     def serialize(self):
         return { 
             "locationId": self.id, 
-            "locationName": self.name, 
             "locationLat": float(self.lat), 
-            "locationLng": float(self.lng) 
+            "locationLng": float(self.lng), 
+            "locationName": self.name 
         }
 
 class Route(db.Model):
@@ -95,10 +91,10 @@ class Route(db.Model):
 
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
 
-    name = Column(String(32), nullable=False)
-
     location_id_1 = Column(Integer, ForeignKey('location.id'), nullable=False)
     location_id_2 = Column(Integer, ForeignKey('location.id'), nullable=False)
+
+    name = Column(String(32), nullable=False)
 
     mon = Column(Boolean, nullable=False, default=False)
     tue = Column(Boolean, nullable=False, default=False)
@@ -130,9 +126,9 @@ class Route(db.Model):
 
         return { 
             "routeId": self.id, 
+            "routeLocation1": self.location_id_1, 
+            "routeLocation2": self.location_id_2, 
             "routeName": self.name, 
-            "routeFrom": self.location_id_1, 
-            "routeTo": self.location_id_2, 
             "routeDays": days 
         }
 
@@ -191,7 +187,10 @@ class Forecast(db.Model):
         days.append({ "icon": self.day_5_icon, "summary": self.day_5_summary, "recommendation": self.day_5_recommendation })
         days.append({ "icon": self.day_6_icon, "summary": self.day_6_summary, "recommendation": self.day_6_recommendation })
 
-        return { "forecastDays": days }
+        return { 
+            "forecastDays": days, 
+            "lastUpdate": self.updated_at.isoformat() 
+        }
 
 class API(db.Model):
 
