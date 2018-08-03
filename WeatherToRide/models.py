@@ -15,15 +15,15 @@ class User(db.Model, UserMixin):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
+    name = Column(String(32), nullable=False)
+
     email = Column(String(32), nullable=False, unique=True)
     email_confirmed = Column(Boolean, nullable=False, default=False)
 
-    _password = Column('password', String(73), nullable=False)
-
-    name = Column(String(32), nullable=False)
-
     phone = Column(String(10), nullable=False, unique=True)
     phone_confirmed = Column(Boolean, nullable=False, default=False)
+
+    _password = Column('password', String(73), nullable=False)
 
     locations = relationship('Location', backref='user', lazy=True)
 

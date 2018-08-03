@@ -25,6 +25,30 @@ class Unique(object):
         if check:
             raise ValidationError(self.message)
 
+class SubmitForm(FlaskForm):
+
+    submit = SubmitField()
+
+class EmailForm(FlaskForm):
+
+    email = EmailField('Email address', validators=[DataRequired()])
+
+    recaptcha = RecaptchaField()
+
+class PasswordForm(FlaskForm):
+
+    password = PasswordField('Password', [
+        DataRequired(), 
+        Length(min=8, message='Your password must be at least 8 characters.')
+    ])
+
+    confirm = PasswordField('Confirm password', [
+        DataRequired(), 
+        EqualTo('password', message='The passwords do not match.')
+    ])
+
+    recaptcha = RecaptchaField()
+
 class LoginForm(FlaskForm):
 
     email = EmailField('Email address', [
@@ -37,7 +61,7 @@ class LoginForm(FlaskForm):
 
     recaptcha = RecaptchaField()
 
-class RegistrationForm(FlaskForm):
+class UserForm(FlaskForm):
 
     email = EmailField('Email address', [
         DataRequired(), 
@@ -103,7 +127,3 @@ class RouteForm(FlaskForm):
         (5, 'Saturday'), 
         (6, 'Sunday')
     ])
-
-class SubmitForm(FlaskForm):
-
-    submit = SubmitField()
