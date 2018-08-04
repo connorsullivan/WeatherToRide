@@ -7,17 +7,20 @@
 
 {% block body %}
 
-    <br><h1>Delete Account</h1><br>
-
-    <p>This will permanently erase your account.</p>
-    <br>
-
-    <form method="POST" action="{{ url_for('delete_user') }}">
-
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-
-        <button type="submit" class="btn btn-primary">Submit</button>
-
-    </form>
+    <div class="jumbotron text-center">
+        <h1>Delete Account</h1>
+        <br><br>
+        <img src="{{ url_for('static', filename='icons/weather/rain.png') }}">
+        <br><br>
+        <br><br>
+        <p class="lead">
+            This will permanently erase your account.
+        </p>
+        <br>
+        <form method="POST" action="{{ url_for('delete_user') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <button type="submit" class="btn btn-danger">Submit</button>
+        </form>
+    </div>
 
 {% endblock %}
