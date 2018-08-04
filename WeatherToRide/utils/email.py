@@ -1,7 +1,7 @@
 
 # Code snippet from: https://sendgrid.com/
 
-from .. import app
+from .. import app, db, models
 
 import datetime
 import sendgrid
