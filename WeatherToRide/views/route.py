@@ -135,7 +135,7 @@ def route_create_view():
     # Check that the user has enough locations
     if len(current_user.locations) < 2:
         flash('You must have at least 2 saved locations to create a route.', 'danger')
-        return redirect(url_for('route_dashboard'))
+        return redirect(url_for('location_view'))
 
     # Get a RouteForm from forms.py
     form = forms.RouteForm()

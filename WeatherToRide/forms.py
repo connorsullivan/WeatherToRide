@@ -4,7 +4,7 @@ from . import models
 from flask_wtf import FlaskForm, RecaptchaField
 
 from wtforms import PasswordField, SelectField, SelectMultipleField, StringField, SubmitField
-from wtforms.fields.html5 import EmailField, TelField
+from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 from wtforms.widgets import CheckboxInput, ListWidget
 
@@ -64,6 +64,11 @@ class LoginForm(FlaskForm):
 
 class UserForm(FlaskForm):
 
+    name = StringField('First name', [ 
+        DataRequired(), 
+        Length(max=32) 
+    ])
+
     email = EmailField('Email address', [ 
         DataRequired(), 
         Email(), 
@@ -79,17 +84,6 @@ class UserForm(FlaskForm):
     confirm = PasswordField('Confirm password', [ 
         DataRequired(), 
         EqualTo('password', message='The passwords do not match.') 
-    ])
-
-    name = StringField('First name', [ 
-        DataRequired(), 
-        Length(max=32) 
-    ])
-
-    phone = TelField('Phone number', [ 
-        DataRequired(), 
-        Length(max=10), 
-        Unique(models.User, models.User.phone, message='That phone number is already in use.') 
     ])
 
     recaptcha = RecaptchaField()

@@ -20,16 +20,13 @@ class User(db.Model, UserMixin):
     email = Column(String(32), nullable=False, unique=True)
     email_confirmed = Column(Boolean, nullable=False, default=False)
 
-    phone = Column(String(10), nullable=False, unique=True)
-    phone_confirmed = Column(Boolean, nullable=False, default=False)
-
     _password = Column('password', String(73), nullable=False)
 
     locations = relationship('Location', backref='user', lazy=True)
 
     routes = relationship('Route', backref='user', lazy=True)
 
-    dev = relationship('Developer', backref='user', lazy=True, uselist=False)
+    developer = relationship('Developer', backref='user', lazy=True, uselist=False)
 
     # Map password to _password
     @hybrid_property

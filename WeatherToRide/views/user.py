@@ -41,8 +41,7 @@ def register():
             user = models.User( 
                 email=form.email.data, 
                 password=form.password.data, 
-                name=form.name.data, 
-                phone=form.phone.data 
+                name=form.name.data 
             )
 
             # Add the user to the database
@@ -73,33 +72,6 @@ def register():
         # If the max user count has been reached
         else:
             flash('Sorry. We are not acccepting new users at the moment.', 'danger')
-
-    # Return the user form
-    return render_template('user-form.html', user=current_user, form=form)
-
-@app.route('/account', methods=['GET', 'POST'])
-@login_required
-def user_update_view():
-
-    # Create an UserForm with the current values populated
-    form = forms.UserForm(
-        name=current_user.name, 
-        email=current_user.email, 
-        phone=current_user.phone
-    )
-
-    # Validate a submitted form
-    if form.validate_on_submit():
-
-        # Try to update the user in the database
-        user.name = form.name.data
-        user.email = form.email.data
-        user.phone = form.phone.data
-        user.password = form.password.data
-
-        db.session.commit()
-
-        flash('Your account information was successfully updated!', 'success')
 
     # Return the user form
     return render_template('user-form.html', user=current_user, form=form)
