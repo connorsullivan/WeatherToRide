@@ -91,6 +91,15 @@
             {% else %}
                 <p>The weather for this location could not be loaded.</p>
             {% endif %}
+            <br>
+            <form action="{{ url_for('location_delete_view', id=location.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="btn-group">
+                    <a href="{{ url_for('location_update_view', id=location.id) }}" 
+                        class="btn btn-primary" role="button">Update</a>
+                    <button class="btn btn-danger">Delete</button>
+                </div>
+            </form>
         </div>
     {% endfor %}
 

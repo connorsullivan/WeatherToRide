@@ -4,33 +4,69 @@
     <a class="navbar-brand" href="{{ url_for('index') }}">WeatherToRide</a>
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+        <span class="navbar-toggler-icon"></span>
     </button>
-  
+
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        {% if user['is_authenticated'] %}
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('location_view') }}">Locations</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('route_view') }}">Routes</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('delete_user') }}">Delete Account</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-            </li>
-        {% else %}
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('register') }}">Register</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-            </li>
-        {% endif %}
-      </ul>
+
+        <ul class="navbar-nav">
+
+            {% if user['is_authenticated'] %}
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('location_view') }}">
+                        <i class="fa fa-map-marker" aria-hidden="true"></i>
+                        &nbsp; My Locations
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('route_view') }}">
+                        <i class="fa fa-road" aria-hidden="true"></i>
+                        &nbsp; My Routes
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-user" aria-hidden="true"></i>
+                        &nbsp; My Account
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="{{ url_for('delete_user') }}">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                            &nbsp; Delete Account
+                        </a>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">
+                        <i class="fa fa-sign-out-alt" aria-hidden="true"></i>
+                        &nbsp; Logout
+                    </a>
+                </li>
+
+            {% else %}
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('register') }}">
+                        <i class="fa fa-user-plus" aria-hidden="true"></i>
+                        &nbsp; Register
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('login') }}">
+                        <i class="fa fa-sign-in-alt" aria-hidden="true"></i>
+                        &nbsp; Login
+                    </a>
+                </li>
+
+            {% endif %}
+
+        </ul>
+
     </div>
 
 </nav>
