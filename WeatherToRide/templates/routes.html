@@ -24,20 +24,17 @@
 
     </div>
 
-    <!-- Form field rendering macro -->
-    {% from "includes/_form_helpers.html" import render_field %}
-
     {% for route in routes %}
 
         <div class="jumbotron text-center">
             <h2>{{ route.name }}</h2>
             <br><br>
             <form action="{{ url_for('route_delete_view', id=route.id) }}" method="POST">
-                {{ form.csrf_token }}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="btn-group">
                     <a href="{{ url_for('route_update_view', id=route.id) }}" 
                         class="btn btn-primary" role="button">Update</a>
-                    {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                    <button class="btn btn-danger">Delete</button>
                 </div>
             </form>
         </div>

@@ -3,7 +3,7 @@ from .. import app, csrf, db, forms, models
 
 from ..utils import validator
 
-from flask import abort, flash, jsonify, redirect, render_template, url_for
+from flask import abort, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 # Limit how many routes a user can have at one time
@@ -204,14 +204,11 @@ def route_create_api(key):
 @login_required
 def route_view():
 
-    # Get a SubmitForm from forms.py
-    form = forms.SubmitForm()
-
     # Get this user's routes
     routes = current_user.routes
 
     # Return the route view
-    return render_template('routes.html', user=current_user, form=form, routes=routes)
+    return render_template('routes.html', user=current_user, routes=routes)
 
 @app.route('/api/<key>/routes')
 @csrf.exempt
@@ -344,11 +341,8 @@ def route_update_api(key):
 @login_required
 def route_delete_view(id):
 
-    # Get a SubmitForm from forms.py
-    form = forms.SubmitForm()
-
-    # Validate a submitted form
-    if form.validate_on_submit():
+    # If a delete request is being submitted
+    if request.method == 'POST':
 
         # Try to delete the route from the database
         route, error = delete_route(current_user.id, id)

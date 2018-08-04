@@ -168,9 +168,6 @@ def location_create_api(key):
 @login_required
 def location_view():
 
-    # Get a SubmitForm from forms.py
-    form = forms.SubmitForm()
-
     # Get this user's locations
     locations = current_user.locations
 
@@ -192,7 +189,6 @@ def location_view():
     # Return the location view
     return render_template('locations.html', 
         user=current_user, 
-        form=form, 
         locations=locations, 
         day_2=(today + datetime.timedelta(days=2)).strftime('%A'), 
         day_3=(today + datetime.timedelta(days=3)).strftime('%A'), 
@@ -293,11 +289,8 @@ def location_update_api(key):
 @login_required
 def location_delete_view(id):
 
-    # Get a SubmitForm from forms.py
-    form = forms.SubmitForm()
-
-    # Validate a submitted form
-    if form.validate_on_submit():
+    # If a delete request is being submitted
+    if request.method == 'POST':
 
         # Try to delete the location from the database
         location, error = delete_location(

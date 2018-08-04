@@ -64,7 +64,7 @@ def get_forecast_from_api(lat, lng):
     try:
         key = app.config['DARKSKY_KEY']
     except:
-        return None, 'The Dark Sky API is not configured. Weather services are unavailable.'
+        return None, 'The weather API key is not configured.'
 
     # Get the current date/time
     now = datetime.datetime.now()
@@ -90,7 +90,7 @@ def get_forecast_from_api(lat, lng):
 
     # Check if the API has reached its call limit for today
     if status.calls_today >= MAX_DAILY_CALLS:
-        return None, 'The weather service has reached capacity for today. Forecasting will be unavailable until tomorrow.'
+        return None, 'The weather service has reached capacity for today.'
     else:
         status.calls_today += 1
         status.calls_total += 1

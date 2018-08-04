@@ -24,9 +24,6 @@
 
     </div>
 
-    <!-- Form field rendering macro -->
-    {% from "includes/_form_helpers.html" import render_field %}
-
     <!-- Dynamic content for dashboard -->
     <div class="accordion" id="dashboard_accordion">
         {% for location in locations %}
@@ -100,11 +97,11 @@
                         {% endif %}
                         <br>
                         <form action="{{ url_for('location_delete_view', id=location.id) }}" method="POST">
-                            {{ form.csrf_token }}
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <div class="btn-group">
                                 <a href="{{ url_for('location_update_view', id=location.id) }}" 
                                     class="btn btn-primary" role="button">Update</a>
-                                {{ form.submit(class_="btn btn-danger", value="Remove") }}
+                                <button class="btn btn-danger">Delete</button>
                             </div>
                         </form>
                     </div>

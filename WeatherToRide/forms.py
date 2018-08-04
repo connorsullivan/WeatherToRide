@@ -25,70 +25,71 @@ class Unique(object):
         if check:
             raise ValidationError(self.message)
 
-class SubmitForm(FlaskForm):
-
-    submit = SubmitField()
-
 class EmailForm(FlaskForm):
 
-    email = EmailField('Email address', validators=[DataRequired()])
+    email = EmailField( 
+        label='Email address', 
+        validators=[ DataRequired() ] 
+    )
 
     recaptcha = RecaptchaField()
 
 class PasswordForm(FlaskForm):
 
-    password = PasswordField('Password', [
-        DataRequired(), 
-        Length(min=8, message='Your password must be at least 8 characters.')
-    ])
+    password = PasswordField( 
+        label='Password', 
+        validators=[ DataRequired(), Length(min=8) ] 
+    )
 
-    confirm = PasswordField('Confirm password', [
-        DataRequired(), 
-        EqualTo('password', message='The passwords do not match.')
-    ])
+    confirm = PasswordField( 
+        label='Confirm password', 
+        validators=[ DataRequired(), EqualTo('password') ] 
+    )
 
     recaptcha = RecaptchaField()
 
 class LoginForm(FlaskForm):
 
-    email = EmailField('Email address', [
-        DataRequired()
-    ])
+    email = EmailField( 
+        label='Email address', 
+        validators=[ DataRequired() ] 
+    )
 
-    password = PasswordField('Password', [
-        DataRequired()
-    ])
+    password = PasswordField( 
+        label='Password', 
+        validators=[ DataRequired() ] 
+    )
 
     recaptcha = RecaptchaField()
 
 class UserForm(FlaskForm):
 
-    email = EmailField('Email address', [
+    email = EmailField('Email address', [ 
         DataRequired(), 
         Email(), 
         Length(max=32), 
-        Unique(models.User, models.User.email, message='That e-mail address is already in use.')
+        Unique(models.User, models.User.email, message='That e-mail address is already in use.') 
     ])
 
-    password = PasswordField('Password', [
+    password = PasswordField('Password', [ 
         DataRequired(), 
-        Length(min=8, message='Your password must be at least 8 characters.')
+        Length(min=8, message='Your password must be at least 8 characters.') 
     ])
 
-    confirm = PasswordField('Confirm password', [
+    confirm = PasswordField('Confirm password', [ 
         DataRequired(), 
-        EqualTo('password', message='The passwords do not match.')
+        EqualTo('password', message='The passwords do not match.') 
     ])
 
-    name = StringField('First name', [
+    name = StringField('First name', [ 
         DataRequired(), 
-        Length(max=32)
+        Length(max=32) 
     ])
 
-    phone = TelField('Phone number', [
+    phone = TelField('Phone number', [ 
         DataRequired(), 
         Length(max=10), 
-        Unique(models.User, models.User.phone, message='That phone number is already in use.')
+        Unique(models.User, models.User.phone, message='That phone number is already in use.') 
     ])
 
     recaptcha = RecaptchaField()
@@ -96,9 +97,9 @@ class UserForm(FlaskForm):
 class LocationForm(FlaskForm):
 
     name = StringField( 
-        label = 'Name of this location', 
-        validators = [ DataRequired(), Length(max=32) ], 
-        render_kw = {"placeholder": "Ray's House"} 
+        label='Name of this location', 
+        validators=[ DataRequired(), Length(max=32) ], 
+        render_kw={"placeholder": "Ray's House"} 
     )
 
     address = StringField( 
@@ -118,12 +119,12 @@ class RouteForm(FlaskForm):
     location_id_1 = SelectField('Start destination', coerce=int, validators=[DataRequired()])
     location_id_2 = SelectField('Final destination', coerce=int, validators=[DataRequired()])
 
-    days = MultiCheckboxField('Days of week', coerce=int, choices=[
+    days = MultiCheckboxField('Days for route', coerce=int, choices=[ 
         (0, 'Monday'), 
         (1, 'Tuesday'), 
         (2, 'Wednesday'), 
         (3, 'Thursday'), 
         (4, 'Friday'), 
         (5, 'Saturday'), 
-        (6, 'Sunday')
+        (6, 'Sunday') 
     ])

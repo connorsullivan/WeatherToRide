@@ -3,7 +3,7 @@ from .. import app, db, forms, models
 
 from ..utils import email
 
-from flask import abort, flash, redirect, render_template, url_for
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
 from itsdangerous import URLSafeTimedSerializer
@@ -66,9 +66,9 @@ def register():
             # Send the e-mail
             email.send(user.email, subject, html)
 
-            flash('Check your e-mail for instructions on how to sign in.', 'success')
+            flash('You have successfully registered!', 'success')
 
-            return redirect(url_for('index'))
+            return redirect(url_for('login'))
         
         # If the max user count has been reached
         else:
@@ -126,19 +126,13 @@ def login():
             # Check if the provided password is correct
             if user.validate_password(form.password.data):
 
-                # Check if the user has confirmed their e-mail
-                if user.email_confirmed:
+                # Sign the user in
+                login_user(user)
 
-                    # Sign the user in
-                    login_user(user)
+                flash(f'Welcome, {current_user.name}.', 'success')
 
-                    flash(f'Welcome, {current_user.name}.', 'success')
-
-                    # Redirect to the homepage
-                    return redirect(url_for('index'))
-
-                else:
-                    flash('You must confirm your e-mail address before signing in.', 'danger')
+                # Redirect to the homepage
+                return redirect(url_for('index'))
 
             # If the password is incorrect
             else:
@@ -168,7 +162,7 @@ def confirm_email(token):
 
     # Validate the token
     try:
-        email = ts.loads(token, salt="confirm-email", max_age=86400)
+        email = ts.loads(token, salt='confirm-email', max_age=86400)
     except:
         abort(404)
 
@@ -231,7 +225,7 @@ def reset_password(token):
 
     # Validate the token
     try:
-        email = ts.loads(token, salt="reset-password", max_age=86400)
+        email = ts.loads(token, salt='reset-password', max_age=86400)
     except:
         abort(404)
 
@@ -263,4 +257,25 @@ def reset_password(token):
     # Return the password reset page
     return render_template('reset-password.html', user=current_user, form=form, token=token)
 
-# Put logic here for account deletion
+@app.route('/account/delete', methods=['GET', 'POST'])
+def delete_user():
+
+    if request.method == 'POST':
+
+        for route in current_user.routes:
+            db.session.delete(route)
+            db.session.commit()
+
+        for location in current_user.locations:
+            db.session.delete(location.forecast)
+            db.session.delete(location)
+            db.session.commit()
+
+        db.session.delete(current_user)
+        db.session.commit()
+
+        logout_user()
+
+        return redirect(url_for('index'))
+
+    return render_template('delete-account.html', user=current_user)

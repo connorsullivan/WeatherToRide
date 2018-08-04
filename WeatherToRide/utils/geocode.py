@@ -55,7 +55,7 @@ def get_coordinates(address):
     try:
         payload['key'] = app.config['GOOGLE_KEY']
     except:
-        return None, None, 'The Google Geocoding API is not configured. Location services are unavailable.'
+        return None, None, 'The geocoding API key is not configured.'
 
     # Get the current date/time
     now = datetime.datetime.now()
@@ -81,7 +81,7 @@ def get_coordinates(address):
 
     # Check if the API has reached its call limit for today
     if status.calls_today >= MAX_DAILY_CALLS:
-        return None, None, 'The location service has reached capacity for today. Geocoding will be unavailable until tomorrow.'
+        return None, None, 'The location service has reached capacity for today.'
     else:
         status.calls_today += 1
         status.calls_total += 1
