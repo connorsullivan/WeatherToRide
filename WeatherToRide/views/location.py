@@ -132,7 +132,7 @@ def location_create_view():
             flash(error, 'danger')
 
     # Return the location form
-    return render_template('location-form.html', user=current_user, form=form)
+    return render_template('location/location-form.html', user=current_user, form=form)
 
 @app.route('/api/<key>/location/create', methods=['POST'])
 @csrf.exempt
@@ -187,7 +187,7 @@ def location_view():
     today = now.date()
 
     # Return the location view
-    return render_template('locations.html', 
+    return render_template('location/locations.html', 
         user=current_user, 
         locations=locations, 
         day_2=(today + datetime.timedelta(days=2)).strftime('%A'), 
@@ -250,7 +250,7 @@ def location_update_view(id):
             flash(error, 'danger')
 
     # Return the location form
-    return render_template('location-form.html', user=current_user, form=form)
+    return render_template('location/location-form.html', user=current_user, form=form)
 
 @app.route('/api/<key>/location/update', methods=['POST'])
 @csrf.exempt

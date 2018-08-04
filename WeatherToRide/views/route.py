@@ -162,7 +162,7 @@ def route_create_view():
             flash(error, 'danger')
 
     # Return the route form
-    return render_template('route-form.html', user=current_user, form=form)
+    return render_template('route/route-form.html', user=current_user, form=form)
 
 @app.route('/api/<key>/route/create', methods=['POST'])
 @csrf.exempt
@@ -208,7 +208,7 @@ def route_view():
     routes = current_user.routes
 
     # Return the route view
-    return render_template('routes.html', user=current_user, routes=routes)
+    return render_template('route/routes.html', user=current_user, routes=routes)
 
 @app.route('/api/<key>/routes')
 @csrf.exempt
@@ -296,7 +296,7 @@ def route_update_view(id):
             flash(error, 'danger')
 
     # Return the route form
-    return render_template('route-form.html', user=current_user, form=form)
+    return render_template('route/route-form.html', user=current_user, form=form)
 
 @app.route('/api/<key>/route/update', methods=['POST'])
 @csrf.exempt

@@ -74,7 +74,7 @@ def register():
             flash('Sorry. We are not acccepting new users at the moment.', 'danger')
 
     # Return the user form
-    return render_template('user-form.html', user=current_user, form=form)
+    return render_template('user/user-form.html', user=current_user, form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -115,7 +115,7 @@ def login():
             flash('That e-mail address is not registered with an account.', 'danger')
 
     # Return the login page
-    return render_template('login.html', user=current_user, form=form)
+    return render_template('user/login.html', user=current_user, form=form)
 
 @app.route('/logout')
 @login_required
@@ -190,7 +190,7 @@ def forgot_password():
             flash('There is no user with that e-mail address.', 'danger')
 
     # Return the forgot password page
-    return render_template('forgot.html', user=current_user, form=form)
+    return render_template('user/forgot.html', user=current_user, form=form)
 
 @app.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
@@ -227,7 +227,7 @@ def reset_password(token):
             flash('There was a problem updating the password.', 'danger')
 
     # Return the password reset page
-    return render_template('reset-password.html', user=current_user, form=form, token=token)
+    return render_template('user/reset-password.html', user=current_user, form=form, token=token)
 
 @app.route('/account/delete', methods=['GET', 'POST'])
 def delete_user():
@@ -250,4 +250,4 @@ def delete_user():
 
         return redirect(url_for('index'))
 
-    return render_template('delete-account.html', user=current_user)
+    return render_template('user/delete-account.html', user=current_user)
