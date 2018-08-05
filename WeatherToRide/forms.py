@@ -15,7 +15,7 @@ class MultiCheckboxField(SelectMultipleField):
 
 class Unique(object):
 
-    def __init__(self, model, field, message='This element already exists.'):
+    def __init__(self, model, field, message):
         self.model = model
         self.field = field
         self.message = message
@@ -38,12 +38,12 @@ class PasswordForm(FlaskForm):
 
     password = PasswordField( 
         label='Password', 
-        validators=[ DataRequired(), Length(min=8) ] 
+        validators=[ DataRequired(), Length(min=8, max=64) ] 
     )
 
     confirm = PasswordField( 
         label='Confirm password', 
-        validators=[ DataRequired(), EqualTo('password') ] 
+        validators=[ EqualTo('password') ] 
     )
 
     recaptcha = RecaptchaField()
@@ -66,25 +66,26 @@ class UserForm(FlaskForm):
 
     name = StringField('First name', [ 
         DataRequired(), 
-        Length(max=32) 
+        Length(max=models.User.name.property.columns[0].type.length) 
     ])
 
-    email = EmailField('Email address', [ 
-        DataRequired(), 
-        Email(), 
-        Length(max=32), 
-        Unique(models.User, models.User.email, message='That e-mail address is already in use.') 
-    ])
+    email = EmailField( 
+        label='Email address', 
+        validators=[ DataRequired(), 
+            Length(max=models.User.email.property.columns[0].type.length), 
+            Unique(models.User, models.User.email, message='That e-mail address is already in use.') 
+        ] 
+    )
 
-    password = PasswordField('Password', [ 
-        DataRequired(), 
-        Length(min=8, message='Your password must be at least 8 characters.') 
-    ])
+    password = PasswordField( 
+        label='Password', 
+        validators=[ DataRequired(), Length(min=8, max=64) ] 
+    )
 
-    confirm = PasswordField('Confirm password', [ 
-        DataRequired(), 
-        EqualTo('password', message='The passwords do not match.') 
-    ])
+    confirm = PasswordField( 
+        label='Confirm password', 
+        validators=[ EqualTo('password') ] 
+    )
 
     recaptcha = RecaptchaField()
 
@@ -92,7 +93,10 @@ class LocationForm(FlaskForm):
 
     name = StringField( 
         label='Name of this location', 
-        validators=[ DataRequired(), Length(max=32) ], 
+        validators=[ 
+            DataRequired(), 
+            Length(max=models.Location.name.property.columns[0].type.length), 
+        ], 
         render_kw={"placeholder": "Ray's House"} 
     )
 
@@ -106,7 +110,10 @@ class RouteForm(FlaskForm):
 
     name = StringField( 
         label = 'Name of this route', 
-        validators = [ DataRequired(), Length(max=32) ], 
+        validators = [ 
+            DataRequired(), 
+            Length(max=models.Route.name.property.columns[0].type.length), 
+        ], 
         render_kw = {'placeholder': 'Work commute'} 
     )
 
