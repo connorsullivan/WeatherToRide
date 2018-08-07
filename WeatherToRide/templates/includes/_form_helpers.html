@@ -1,4 +1,6 @@
 
+<!-- Adapted from: http://flask.pocoo.org/docs/1.0/patterns/wtforms/ -->
+
 {% macro render_field(field) %}
   {{ field.label }}
   {{ field(**kwargs)|safe }}

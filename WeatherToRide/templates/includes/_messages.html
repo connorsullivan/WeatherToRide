@@ -1,4 +1,6 @@
 
+<!-- Adapted from http://flask.pocoo.org/docs/1.0/patterns/flashing/ -->
+
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}

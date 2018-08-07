@@ -43,3 +43,5 @@ sudo a2ensite ${PROJECT_NAME}.conf
 
 # Restart Apache
 sudo service apache2 restart
+
+echo "Finished provisioning system!"

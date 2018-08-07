@@ -7,11 +7,7 @@ import requests
 API_NAME = 'Dark Sky'
 MAX_DAILY_CALLS = 500
 
-'''
-    Mapping Dark Sky forecasts to colorful icons
-
-    Icons by: https://www.flaticon.com/
-'''
+# Icons from https://www.flaticon.com/
 icon_map = { 
     'clear-day': 'clear-day', 
     'clear-night': 'clear-night', 

@@ -29,9 +29,43 @@
         <div class="jumbotron text-center">
             <h2>{{ route.name }}</h2>
             <br><br>
+            
+            <!-- Carousel for forecasts from both of route's locations -->
+            <div id="route_carousel_{{ route.id }}" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    {% for f in route.forecast %}
+                        <div class="carousel-item {{ 'active' if loop.first }}">
+                            <h5>{{ f.day }}</h6>
+
+                            <div class="row">
+                                <div class="col-md-6" style="border-right: 1px dashed #ccc">
+                                    <h6>{{ route.location_1_name }}</h6>
+                                    <br><img src="/static/icons/weather/{{ f.location_1.icon }}.png"><br><br>
+                                    <p class="lead">{{ f.location_1.summary }}</p>
+                                    <p class="lead">{{ f.location_1.recommendation }}</p>
+                                </div>
+                                <div class="col-md-6" style="border-left: 1px dashed #ccc">
+                                    <h6>{{ route.location_2_name }}</h6>
+                                    <br><img src="/static/icons/weather/{{ f.location_2.icon }}.png"><br><br>
+                                    <p class="lead">{{ f.location_2.summary }}</p>
+                                    <p class="lead">{{ f.location_2.recommendation }}</p>
+                                </div>                                
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <a class="carousel-control-prev" href="#route_carousel_{{ route.id }}" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" style="color: black;"></span>
+                </a>
+                <a class="carousel-control-next" href="#route_carousel_{{ route.id }}" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" style="color: black;"></span>
+                </a>
+            </div>
+            <!-- end Carousel -->
+
             <form action="{{ url_for('route_delete_view', id=route.id) }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <div class="btn-group">
+                <div class="btn-group" style="margin-top: 15px;">
                     <a href="{{ url_for('route_update_view', id=route.id) }}" 
                         class="btn btn-primary" role="button">Update</a>
                     <button class="btn btn-danger">Delete</button>

@@ -6,6 +6,8 @@ from ..utils import validator
 from flask import abort, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
+import datetime
+
 # Limit how many routes a user can have at one time
 MAX_ROUTES = 5
 
@@ -203,9 +205,37 @@ def route_create_api(key):
 @app.route('/routes')
 @login_required
 def route_view():
-
-    # Get this user's routes
-    routes = current_user.routes
+    today = datetime.date.today()
+    db_routes = current_user.routes
+    routes = []
+    for r in db_routes:
+        location_1 = models.Location.query.get(r.location_id_1)
+        location_2 = models.Location.query.get(r.location_id_2)
+        forecast = []
+        for i in range(7):
+            day = (today + datetime.timedelta(days=i))
+            # if the route is active for this day
+            if getattr(r, day.strftime('%a').lower()):
+                forecast.append({
+                    'day': 'Today' if i == 0 else 'Tomorrow' if i == 1 else day.strftime('%A'),
+                    'location_1': {
+                        'icon': getattr(location_1.forecast, f'day_{i}_icon'),
+                        'summary': getattr(location_1.forecast, f'day_{i}_summary'),
+                        'recommendation': getattr(location_1.forecast, f'day_{i}_recommendation')
+                    },
+                    'location_2': {
+                        'icon': getattr(location_2.forecast, f'day_{i}_icon'),
+                        'summary': getattr(location_2.forecast, f'day_{i}_summary'),
+                        'recommendation': getattr(location_2.forecast, f'day_{i}_recommendation')
+                    }
+                })
+        routes.append({
+            'id': r.id,
+            'name': r.name,
+            'location_1_name': location_1.name,
+            'location_2_name': location_2.name,
+            'forecast': forecast
+        })
 
     # Return the route view
     return render_template('route/routes.html', user=current_user, routes=routes)

@@ -12,6 +12,7 @@ import sys
 
 ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
+# Limit how many user accounts can be created at one time
 MAX_USERS = 5
 
 @app.route('/register', methods=['GET', 'POST'])

@@ -1,5 +1,5 @@
 
-# Code snippet from: https://sendgrid.com/
+# Adapted from https://sendgrid.com/
 
 from .. import app, db, models
 
