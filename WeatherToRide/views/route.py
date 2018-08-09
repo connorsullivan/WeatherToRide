@@ -2,6 +2,7 @@
 from .. import app, csrf, db, forms, models
 
 from ..utils import validator
+from ..utils.weather import ride_danger, ride_ok, ride_warn
 
 from flask import abort, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -171,7 +172,7 @@ def route_create_view():
 def route_create_api(key):
 
     # Validate the API key
-    user, error = validators.validate_developer(key)
+    user, error = validator.validate_developer(key)
     if error:
         return jsonify({ 'error': error }), 400
 
@@ -216,17 +217,27 @@ def route_view():
             day = (today + datetime.timedelta(days=i))
             # if the route is active for this day
             if getattr(r, day.strftime('%a').lower()):
+                loc1_rec = getattr(location_1.forecast, f'day_{i}_recommendation')
+                loc2_rec = getattr(location_2.forecast, f'day_{i}_recommendation')
+
+                # cascade down danger levels to provide a singular recommendation
+                if loc1_rec == ride_danger or loc2_rec == ride_danger:
+                    recommendation = ride_danger
+                elif loc1_rec == ride_warn or loc2_rec == ride_warn:
+                    recommendation = ride_warn
+                else:
+                    recommendation = ride_ok
+
                 forecast.append({
                     'day': 'Today' if i == 0 else 'Tomorrow' if i == 1 else day.strftime('%A'),
+                    'recommendation': recommendation,
                     'location_1': {
                         'icon': getattr(location_1.forecast, f'day_{i}_icon'),
                         'summary': getattr(location_1.forecast, f'day_{i}_summary'),
-                        'recommendation': getattr(location_1.forecast, f'day_{i}_recommendation')
                     },
                     'location_2': {
                         'icon': getattr(location_2.forecast, f'day_{i}_icon'),
                         'summary': getattr(location_2.forecast, f'day_{i}_summary'),
-                        'recommendation': getattr(location_2.forecast, f'day_{i}_recommendation')
                     }
                 })
         routes.append({
@@ -245,7 +256,7 @@ def route_view():
 def route_api(key):
 
     # Validate the API key
-    user, error = validators.validate_developer(key)
+    user, error = validator.validate_developer(key)
     if error:
         return jsonify({ 'error': error }), 400
 
@@ -333,7 +344,7 @@ def route_update_view(id):
 def route_update_api(key):
 
     # Validate the API key
-    user, error = validators.validate_developer(key)
+    user, error = validator.validate_developer(key)
     if error:
         return jsonify({ 'error': error }), 400
 
@@ -391,7 +402,7 @@ def route_delete_view(id):
 def route_delete_api(key):
 
     # Validate the API key
-    user, error = validators.validate_developer(key)
+    user, error = validator.validate_developer(key)
     if error:
         return jsonify({ 'error': error }), 400
 

@@ -139,7 +139,7 @@ def location_create_view():
 def location_create_api(key):
 
     # Validate the API key
-    user, error = validators.validate_developer(key)
+    user, error = validator.validate_developer(key)
     if error:
         return jsonify({ 'error': error }), 400
 
@@ -203,7 +203,7 @@ def location_view():
 def location_api(key):
 
     # Validate the API key
-    user, error = validators.validate_developer(key)
+    user, error = validator.validate_developer(key)
     if error:
         return jsonify({ 'error': error }), 400
 
@@ -257,7 +257,7 @@ def location_update_view(id):
 def location_update_api(key):
 
     # Validate the API key
-    user, error = validators.validate_developer(key)
+    user, error = validator.validate_developer(key)
     if error:
         return jsonify({ 'error': error }), 400
 
@@ -312,7 +312,7 @@ def location_delete_view(id):
 def location_delete_api(key):
 
     # Validate the API key
-    user, error = validators.validate_developer(key)
+    user, error = validator.validate_developer(key)
     if error:
         return jsonify({ 'error': error }), 400
 

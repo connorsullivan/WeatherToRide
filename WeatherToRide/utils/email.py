@@ -60,4 +60,7 @@ def send(to_address, subject, message):
     mail = Mail(from_email, subject, to_email, content)
 
     # Send the e-mail and return the response
-    return sg.client.mail.send.post(request_body=mail.get()), None
+    try:
+        return sg.client.mail.send.post(request_body=mail.get()), None
+    except:
+        return None
